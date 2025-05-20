@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# Virtualenv
+venv/
+ENV/
+.venv/
+
+
+# Environment and secrets
+.env
+.env.*
+
+# Node (if used for JS/CSS builds)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+
+# Migration backups (optional)
+**/migrations/**/ __pycache__/
+**/migrations/**/ *.pyc
+**/migrations/**/ *.py~ 
+
+# Test reports
+htmlcov/
+.coverage
+.tox/
