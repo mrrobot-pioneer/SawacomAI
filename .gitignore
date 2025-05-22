@@ -13,10 +13,10 @@ venv/
 ENV/
 .venv/
 
-
 # Environment and secrets
 .env
 .env.*
+
 
 # Node (if used for JS/CSS builds)
 node_modules/
