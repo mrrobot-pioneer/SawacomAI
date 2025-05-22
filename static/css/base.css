@@ -13,12 +13,12 @@
     --primary-color: #4d6bfe;
     --secondary-color: #dbeafe;
     --btn-hover: #c6dcf8;
-    --text-color: #1a1a1a;
-    --text-faded: #666666;
+    --text-color: #404040;
+    --text-faded: #8d8c8c;
     --bg-color: #fff;
     --bg-sidebar: #f9fbff;
     --bg-tooltip: #333;
-    --input-bg: #f3f4f6;
+    --input-bg: #eee;
     --input-border: #dce0e9;
     --success-bg: #E6FFFA;
     --success-text: #2C7A7B;
@@ -26,7 +26,6 @@
     --error-text: #e53535;
     --warning-bg: #FFFAF0;
     --warning-text: #975A16;
-    --line-shadow: 0 1px 0 #0000000d;
 }
   
 html {
@@ -46,12 +45,21 @@ main {
 }
 
 p{
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 400;
 }  
 
 a{
     color: var(--primary-color);
+    transition: all 0.1s ease-in-out;
+}
+a:hover{
+    color: var(--text-faded);
+}
+
+h1{
+    font-size: 3rem;
+    font-weight: 700;
 }
 
 /* Global scrollbar styles */
@@ -61,7 +69,7 @@ a{
 }
 
 *::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgba(0, 0, 0, 0.15);
     border-radius: 4px;
 }
 
@@ -100,9 +108,17 @@ a{
 
 .border{
     height: 1px;
-    box-shadow: var(--line-shadow);
+    background-color: var(--input-border);
     border-radius: .5px;
     width: 100%;
+}
+
+.separator{
+    height: .5rem;
+    aspect-ratio: 1/1;
+    background-color: var(--text-faded);
+    border-radius: 50%;
+    display: inline-block;
 }
 
 .tooltip{
@@ -196,7 +212,7 @@ a{
 }
 
 .sidebar-top .top i{
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: var(--text-faded);
 }
 
@@ -246,7 +262,7 @@ a{
 .sidebar-middle .chats li a{
     color: var(--text-color);
     font-weight: 400;
-    font-size: 1.4rem;
+    font-size: 1.35rem;
     display: block;
     text-decoration: none;
     white-space: nowrap;   
@@ -325,6 +341,19 @@ a{
     }
 }
 
+.no-chats-message {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-faded);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+.no-chats-message i {
+    font-size: 2rem;
+  }
+
 .sidebar-bottom{
     padding: 0 1.5rem 2rem 2rem;
 }
@@ -341,12 +370,7 @@ a{
     color: var(--text-color);
     font-weight: 400;
     text-decoration: none;
-    font-size: 1.4rem;
-}
-
-.sidebar-bottom a:hover{
-    color: var(--text-color);
-    transition: all 0.1s ease-in-out;
+    font-size: 1.35rem;
 }
 
 /* Overlay for mobile */
@@ -367,7 +391,7 @@ a{
     width: 100%;
     justify-content: space-between;
     align-items: center;
-    height: 60px;
+    height: 6rem;
     padding: 0 1rem;
     background-color: var(--bg-color);
     position: sticky;
@@ -401,8 +425,8 @@ a{
 }
 
 .header .sidebar-toggle i{
-    font-size: 2.5rem;
-    color: var(--text-color);
+    font-size: 2rem;
+    color: var(--text-faded);
 }
 
 .header .account{
@@ -418,7 +442,7 @@ a{
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .tooltip{
         display: none !important;
     }

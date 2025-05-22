@@ -1,14 +1,68 @@
+<!-- Home page -->
+
 {% extends "base.html" %}
 
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'chat/index.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="chat-container">
-    <h2>Welcome to Tranquil Chat</h2>
-    <div id="chat-box"></div>
-    <form id="chat-form" method="post">
-        {% csrf_token %}
-        <input type="text" name="message" placeholder="Type your message..." required>
-        <button type="submit">Send</button>
-    </form>
+
+<div class="index">
+    <div class="chat-start">
+        <!-- Welcome Message -->
+        <div class="welcome-message">
+            <h1 style="text-align: center;">Hi, I’m Sawacom — your mental health AI</h1>
+            
+            <div class="subtext-rotator">
+                <div class="subtext active" id="subtextContainer">
+                  <span>
+                    <i class="fas fa-user-secret"></i> Anonymous
+                  </span>
+                  <span class="separator"></span>
+                  <span>
+                    <i class="fas fa-dollar-sign"></i> Free
+                  </span>
+                  <span class="separator"></span>
+                  <span>
+                    <i class="fas fa-lock"></i> Secure
+                  </span>
+                </div>
+              </div>
+        </div>
+
+        <!-- Chat Input -->
+        <form class="chat-input-box" id="chatForm">
+            <textarea class="chat-input" id="userInput" placeholder="Ask Sawacom..." rows="1" autocomplete="off"></textarea>
+            <button type="submit" id="sendButton" disabled>
+                <i class="fa-solid fa-arrow-up"></i>
+                <span class="tooltip">Message is empty</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-window" id="chatWindow">
+        <!-- Chat messages will go here -->
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-disclaimer">
+        <p class="small-text">
+            Semacom is an AI assistant, not a licensed professional.
+            For emergencies, call <strong>999</strong> or
+            <a href="#">Book Appointment</a> with a professional. <br>
+            By messaging Semacom, you agree to our
+            <a href="#">Terms of Service</a> & <a href="#">Privacy Policy</a>.
+        </p>
+    </footer>
 </div>
 
+{% endblock %}
+
+
+{% block scripts %}
+    <script src="{% static 'chat/index.js' %}" defer></script>
 {% endblock %}
