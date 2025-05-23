@@ -358,7 +358,7 @@ h1{
     padding: 0 1.5rem 2rem 2rem;
 }
 
-.sidebar-bottom .pages{
+.sidebar-links{
     list-style: none;
     margin-bottom: 1rem;
     display: flex;
@@ -366,11 +366,22 @@ h1{
     gap: 1.5rem;
 }
 
-.sidebar-bottom .pages a{
+.sidebar-links li {
+    display: flex;
+    align-items: center;
+    color: var(--text-color);
+    transition: all 0.1s ease-in-out;
+  }
+
+.sidebar-links a{
     color: var(--text-color);
     font-weight: 400;
     text-decoration: none;
     font-size: 1.35rem;
+    transition: all 0.1s ease-in-out;
+}
+.sidebar-links a:hover{
+    opacity: 0.8;
 }
 
 /* Overlay for mobile */

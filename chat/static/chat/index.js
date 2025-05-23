@@ -10,7 +10,7 @@ const messages = [
       <span><i class="fas fa-lock"></i> Secure</span>
     `,
     `
-    <div><i class="fas fa-calendar-check"></i> <a href="#">Book professional appointment</a> – <strong>Ksh 4500</strong></div>    
+    <span><i class="fas fa-user-md"></i> <a href="#">Book a Professional</a> for <strong>Ksh 4500</strong></span>
     `
   ];
   
