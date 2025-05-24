@@ -11,9 +11,17 @@
 {% block content %}
 
 <div class="index">
-    <div class="chat-start">
+    <!-- Chat area when users sends message -->
+    <div class="chat-body" id="chatBody">
+        <div class="messages" id="messages">
+            <!-- Messages will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <!-- initial display when no chats yet -->
+    <div class="chat-start" id="chatStart">
         <!-- Welcome Message -->
-        <div class="welcome-message">
+        <div class="welcome-message" id="welcomeMessage">
             <h1 style="text-align: center;">Hi, I’m Sawacom — your mental health AI</h1>
             
             <div class="subtext-rotator">
@@ -30,26 +38,22 @@
                     <i class="fas fa-lock"></i> Secure
                   </span>
                 </div>
-              </div>
+            </div>
         </div>
 
         <!-- Chat Input -->
-        <form class="chat-input-box" id="chatForm">
+        <form class="chat-input-box" id="chatInputBox">
             <textarea class="chat-input" id="userInput" placeholder="Ask Sawacom..." rows="1" autocomplete="off"></textarea>
             <button type="submit" id="sendButton" disabled>
                 <i class="fa-solid fa-arrow-up"></i>
-                <span class="tooltip">Message is empty</span>
+                <span class="tooltip empty-message">Message is empty</span>
             </button>
         </form>
     </div>
 
-    <!-- Chat Area -->
-    <div class="chat-window" id="chatWindow">
-        <!-- Chat messages will go here -->
-    </div>
-
     <!-- Footer -->
-    <footer class="footer-disclaimer">
+    <footer class="chat-footer" id="chatFooter">
+        <!-- chat-input-box will be inserted here when user sends a message-->
         <p class="disclaimer small-text">
             Sawacom is an AI assistant and not a licensed professional. 
             For emergencies, call 999 or <a href="#">Book a professional</a>. 
