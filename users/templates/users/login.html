@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+Login securely to Sawacom | 24/7 AI Mental Health Companion
+{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'users/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="container" id="login-section">
+    <h1>Welcome Back</h1>
+    <form>
+        <div class="input-group">
+            <label for="login-email">Email address</label>
+            <input type="email" id="login-email" placeholder="Enter your email address" required>
+        </div>
+
+        <div class="input-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" placeholder="Enter your password" required>
+        </div>
+
+      <button type="submit" class="submit-btn primary-btn">Login</button>
+      <p class="subtitle">Don’t have an account yet? <a href="{% url 'users:signup' %}">Sign Up</a></p>
+
+      <div class="divider"><span>OR</span></div>
+
+      <div class="social-btns">
+        <button type="button" class="social-btn">
+          <span class="social-icon"><img src="{% static 'images/icons/google-icon.svg' %}" alt="Google icon" width="30"></span>
+          Continue with Google
+        </button>
+      </div>
+    </form>
+  </section>
+
+{% endblock %}
