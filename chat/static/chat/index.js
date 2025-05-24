@@ -104,7 +104,7 @@ function simulateBotResponse() {
   setTimeout(() => {
     // insert real bot text here
     thinking.querySelector('.message-text').innerText =
-      "Add layout CSS to ensure it behaves as a fixed footer on scroll. Thanks for your message. Let's talk about it.";
+      "Hello, I’m Sawacom—your AI mental health companion. I’m here to listen, provide support, and help guide you toward well-being.";
     thinking.classList.remove('thinking');
     scrollChatToBottom();
 

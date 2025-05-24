@@ -26,6 +26,7 @@
     --error-text: #e53535;
     --warning-bg: #FFFAF0;
     --warning-text: #975A16;
+    --shadow: 1px 4px 10px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.08);
 }
   
 html {
@@ -56,6 +57,7 @@ a{
 }
 a:hover{
     color: var(--text-faded);
+    text-decoration: underline;
 }
 
 h1{
@@ -88,17 +90,22 @@ h1{
 .primary-btn {
     background-color: var(--secondary-color);
     color: var(--primary-color);
-    padding: 1rem;
+    padding: 1rem 2rem;
     border-radius: 3rem;
+    font-weight: 500;
+    font-size: 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
+    text-decoration: none;
     transition: all 0.1s ease-in-out;
 }
 .primary-btn:hover {
     background-color: var(--btn-hover);
     cursor: pointer;
+    text-decoration: none;
+    color: var(--primary-color);
 }
 
 .small-text{
@@ -139,6 +146,126 @@ h1{
     white-space: nowrap;
     font-size: 1.2rem;
 }
+
+@keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+}
+  
+/* utility class for slide in */
+  .slide-in {
+    animation: fadeIn 0.15s ease-in-out both;
+}
+
+
+/* Header */
+.header{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    height: 6rem;
+    padding: 0 1rem;
+    background-color: var(--bg-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header .sidebar-toggle{
+    display: none;
+    align-items: center;
+    justify-content: center;
+    height: 3.5rem;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.1s ease-in-out;
+}
+.header .sidebar-toggle:hover{
+    cursor: pointer;
+    background-color: var(--input-bg);
+}
+
+.header .sidebar-toggle .tooltip {
+   left: 0;
+   transform: translateX(0);
+}
+
+.header .sidebar-toggle:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.header .sidebar-toggle i{
+    font-size: 2rem;
+    color: var(--text-faded);
+}
+
+.header .account{
+    margin-left: auto;
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.account-icon i.fa-user-circle {
+    font-size: 2.5rem;
+    color: var(--text-faded);
+    cursor: pointer;
+}
+ 
+/* the dropdown menu, hidden by default */
+.account-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.5rem);
+    background: var(--bg-color);
+    border-radius: 1.5rem;
+    box-shadow: var(--shadow);
+    list-style: none;
+    padding: 0.5rem;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    width: max-content;
+    z-index: 100;
+}
+
+.account-icon.open .account-dropdown {
+    display: flex;
+}
+  
+.account-dropdown li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    font-size: 1.35rem;
+}
+.account-dropdown li + li {
+    border-top: 1px solid var(--input-border);
+}
+.account-dropdown li i {
+    font-size: 1.5rem;
+}
+.account-dropdown li a{
+    text-decoration: none;
+    color: var(--text-color);
+}
+.account-dropdown li a:hover {
+    text-decoration: underline;
+}
+.account-dropdown li.delete-account, .account-dropdown li.delete-account a{
+    color: var(--error-text);
+}
+
 
 /* Sidebar */
 .sidebar {
@@ -218,8 +345,6 @@ h1{
 }
 
 .newchat-btn{
-    font-weight: 500;
-    font-size: 1.5rem;
     padding: 1rem 2rem;
     width: fit-content;
 }
@@ -296,12 +421,11 @@ h1{
     top: 100%;
     right: 1rem;
     background: var(--bg-color);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    box-shadow: var(--shadow);
     border-radius: 1.5rem;
     padding: .5rem;
     z-index: 10000;
     min-width: 100px;
-    animation: fadeIn 0.1s ease-in-out;
 }
 
 .chat-options .option {
@@ -370,7 +494,6 @@ h1{
 .sidebar-links li {
     display: flex;
     align-items: center;
-    color: var(--text-color);
     transition: all 0.1s ease-in-out;
   }
 
@@ -382,7 +505,8 @@ h1{
     transition: all 0.1s ease-in-out;
 }
 .sidebar-links a:hover{
-    opacity: 0.8;
+    color: var(--text-faded);
+    text-decoration: underline;
 }
 
 /* Overlay for mobile */
@@ -397,64 +521,14 @@ h1{
     backdrop-filter: blur(2px);
 }
 
-/* Header */
-.header{
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-    height: 6rem;
-    padding: 0 1rem;
-    background-color: var(--bg-color);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.header .sidebar-toggle{
-    display: none;
-    align-items: center;
-    justify-content: center;
-    height: 3.5rem;
-    aspect-ratio: 1/1;
-    border-radius: 50%;
-    position: relative;
-    transition: all 0.1s ease-in-out;
-}
-.header .sidebar-toggle:hover{
-    cursor: pointer;
-    background-color: var(--input-bg);
-}
-
-.header .sidebar-toggle .tooltip {
-   left: 0;
-   transform: translateX(0);
-}
-
-.header .sidebar-toggle:hover .tooltip {
-    visibility: visible;
-    opacity: 1;
-}
-
-.header .sidebar-toggle i{
-    font-size: 2rem;
-    color: var(--text-faded);
-}
-
-.header .account{
-    margin-left: auto;
-}
-
-.header .account a{
-   text-decoration: none;
-   padding: 1rem 2rem;
-   font-size: 1.5rem;
-   font-weight: 500;
-   
-}
 
 /* Responsive */
 @media (max-width: 1024px) {
+    *::-webkit-scrollbar {
+        width: 5px;
+        height: 5px; 
+    }
+    
     .tooltip{
         display: none !important;
     }

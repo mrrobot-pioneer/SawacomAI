@@ -1,4 +1,19 @@
-/***** sidebar toggle functionality for both mobile and desktop views *****/
+/*** Header and Sidebar functionalty ****/
+
+// account dropdown toggle
+const accountIcon = document.getElementById('accountIcon');
+accountIcon.addEventListener('click', e => {
+  e.stopPropagation();             
+  accountIcon.classList.toggle('open');
+});
+
+// close account dropdown when clicking outside
+document.addEventListener('click', () => {
+  accountIcon.classList.remove('open');
+});
+
+
+// Sidebar toggle functionality for both mobile and desktop 
 
 const sidebar = document.querySelector('.sidebar');
 const sidebarCollapse = document.getElementById('sidebarCollapse');
