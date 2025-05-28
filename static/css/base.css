@@ -47,7 +47,7 @@ main {
 }
 
 p{
-    font-size: 1.4rem;
+    font-size: 1.35rem;
     font-weight: 400;
 }  
 
@@ -61,7 +61,7 @@ a:hover{
 }
 
 h1{
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 700;
 }
 
@@ -142,8 +142,9 @@ h1{
     top: 120%;
     left: 50%;
     transform: translateX(-50%);
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.2s ease-in-out 0.2s;
     white-space: nowrap;
+    pointer-events: none;
     font-size: 1.2rem;
 }
 
@@ -257,9 +258,7 @@ h1{
     gap: 1rem;
     padding: 1rem;
     font-size: 1.35rem;
-}
-.account-dropdown li + li {
-    border-top: 1px solid var(--input-border);
+    border-radius:1rem;
 }
 .account-dropdown li i {
     font-size: 1.5rem;
@@ -268,11 +267,24 @@ h1{
     text-decoration: none;
     color: var(--text-color);
 }
-.account-dropdown li a:hover {
-    text-decoration: underline;
+.account-dropdown li:hover {
+    background-color: var(--input-bg);
+}
+.account-dropdown li.username{
+    border-bottom: 1px solid var(--input-border);
+    border-radius: 0;
+    margin-bottom: .5rem;
+    cursor: auto;
+}
+.account-dropdown li.username:hover{
+    background-color: transparent;
 }
 .account-dropdown li.delete-account, .account-dropdown li.delete-account a{
     color: var(--error-text);
+}
+.account-dropdown li.delete-account:hover{
+    color: var(--error-text);
+    background-color: var(--error-bg);
 }
 
 
@@ -314,15 +326,22 @@ h1{
     padding: 2rem .5rem 0 2rem;
 }
 
-.sidebar-top .top{
+.sidebar-top .upper{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;;
+    gap: 1rem;
+    width: 100%;
+}
+
+.sidebar-top .logo-image{
+    width: 3.8rem;
+    aspect-ratio: 1/1;
 }
 
 .sidebar-top h1 {
-    font-size: 3rem;
+    font-size: 2.5rem;
+    line-height: 2.5rem;
 }
 
 .sidebar-top .sidebar-collapse, .sidebar-top .sidebar-close {
@@ -348,7 +367,7 @@ h1{
     display: none;
 }
 
-.sidebar-top .top i{
+.sidebar-top .upper i{
     font-size: 2rem;
     color: var(--text-faded);
 }

@@ -14,10 +14,21 @@
     margin: auto 0;
 }
 
+.chat-start .logo{
+   display: flex;
+   justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.chat-start .logo img{
+    width: 10rem;
+    height: 10rem;
+} 
+
 .welcome-message .subtext-rotator {
     position: relative;
     height: 3.5rem;
-    margin: 1.5rem 0;
+    margin: 1rem 0 1.5rem 0;
     overflow: hidden;
     display: flex;
     justify-content: center;
@@ -31,7 +42,7 @@
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    font-size: 1.4rem;
+    font-size: 1.35rem;
     color: var(--text-faded);
     opacity: 0;
     transform: translateY(100%);

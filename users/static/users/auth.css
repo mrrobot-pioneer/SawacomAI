@@ -1,4 +1,4 @@
-.container {
+.auth-container {
     max-width: 40rem;
     margin: 4rem auto;
     padding: 2rem;
@@ -6,58 +6,60 @@
     border-radius: 1.5rem;
     border: 1px solid var(--input-border);
   }
-  h1 {
+
+.auth-container h1 {
     text-align: center;
     margin-bottom: 1rem;
   }
   
-  form {
+.auth-container form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
-  .input-group {
+.auth-container .input-group {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
   }
-  label {
+.auth-container label {
     font-size: 1.35rem;
     margin-left: 1rem;
   }
-  input[type="email"],
-  input[type="password"] {
+.auth-container input[type="email"],
+.auth-container input[type="password"] {
     width: 100%;
-    padding: 1.2rem;
+    padding: 1rem 1.2rem;
     font-size: 1.35rem;
     border: 1px solid var(--input-border);
     border-radius: 3rem;
     background: var(--input-bg);
   }
-  .submit-btn {
+.auth-container .submit-btn {
     display: block;
     width: 100%;
     color: #fff;
     background: var(--primary-color);
     margin-top: 1.5rem;
   }
-  .submit-btn:hover {
-    background: var(--btn-hover);
-    color: var(--primary-color);
+.auth-container .submit-btn:hover {
+    opacity: .8;
+    background: var(--primary-color);
+    color: #fff;
   }
-  p.subtitle {
+.auth-container p.subtitle {
     text-align: center;
     font-size: 1.35rem;
     color: var(--text-faded);
     margin-top: 1rem;
   }
-  .divider {
+.auth-container .divider {
     text-align: center;
     margin: 1.5rem 0;
     position: relative;
   }
-  .divider::before,
-  .divider::after {
+.auth-container .divider::before,
+.auth-container .divider::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -65,20 +67,20 @@
     height: 1px;
     background: var(--input-border);
   }
-  .divider::before { left: 0; }
-  .divider::after { right: 0; }
-  .divider span {
+.auth-container .divider::before { left: 0; }
+.auth-container .divider::after { right: 0; }
+.auth-container .divider span {
     display: inline-block;
     padding: 0 1rem;
     background: var(--bg-color);
     color: var(--text-faded);
     font-size: 1.35rem;
   }
-  .social-btns {
+.auth-container .social-btns {
     display: flex;
     gap: 1rem;
   }
-  .social-btn {
+.auth-container .social-btn {
     flex: 1;
     display: flex;
     align-items: center;
@@ -91,28 +93,28 @@
     cursor: pointer;
     transition: all 0.15s ease;
   }
-  .social-btn:hover {
+.auth-container .social-btn:hover {
     background: var(--input-bg);
   }
-  .social-icon {
+.auth-container .social-icon {
     margin-right: 0.8rem;
     height: 3rem;
     width: 3rem;
   }
-  .footer-text {
+.auth-container .footer-text {
     text-align: center;
     font-size: 1.4rem;
     margin-top: 1.5rem;
     color: var(--text-faded);
   }
-  .footer-text a {
+.auth-container .footer-text a {
     color: var(--primary-color);
     text-decoration: none;
     font-weight: 500;
   }
 
 @media (max-width: 425px) {
-    .container {
+    .auth-container {
         margin: 3rem 1.5rem;
         padding: 1.5rem;
     }

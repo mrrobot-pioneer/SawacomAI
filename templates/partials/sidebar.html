@@ -1,12 +1,15 @@
 <!-- Base Sidebar Navigation [styles in base.css]-->
 
+{% load static %}
+
 <!-- Overlay (for mobile) -->
 <div class="sidebar-overlay"></div>
 
 <!-- Sidebar -->
 <aside class="sidebar">
     <div class="sidebar-top">
-        <div class="top">
+        <div class="upper">
+            <img src="{% static 'images/logo.png' %}" alt="Sawacom Logo" class="logo-image"/>
             <h1>Sawacom</h1>
             <!-- Collapse button in desktop-->
             <div class="sidebar-collapse">
