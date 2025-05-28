@@ -1,0 +1,63 @@
+  .pages-container {
+    padding: 3rem 5rem;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 800px;
+    min-height: calc(100vh - 6rem);
+  }
+
+  .pages-container h1 {
+    margin: 2rem 0;
+  }
+
+  .pages-container h2{
+    margin: 3rem 0 1rem;
+  }
+
+.pages-container ul,
+.pages-container ol {
+  margin: 1.5rem 0;             /* space above & below lists */
+  padding-left: 2.5rem;         /* indent the list items */
+  line-height: 1.6;             /* easier to read when wrapping */
+}
+
+/* List markers */
+.pages-container ul {
+  list-style-type: disc;        /* solid circle bullets */
+}
+.pages-container ol {
+  list-style-type: decimal;     /* 1., 2., 3., … */
+}
+
+.pages-container ul li::marker,
+.pages-container ol li::marker {
+  font-size: 1.5rem;
+}
+
+/* Space out individual items */
+.pages-container li {
+  margin-bottom: 0.5rem;
+  font-size: 1.35rem;
+  font-weight: 400;
+}
+
+/* Tighter nesting for sub-lists */
+.pages-container ul ul,
+.pages-container ul ol,
+.pages-container ol ul,
+.pages-container ol ol {
+  margin: 0.75rem 0 0.75rem 1.5rem;
+}
+
+/* Remove bottom margin on last item */
+.pages-container ul li:last-child,
+.pages-container ol li:last-child {
+  margin-bottom: 0;
+}
+
+
+  @media (max-width: 1024px) {
+    .pages-container{
+        padding: 2rem 1rem;
+    }   
+}

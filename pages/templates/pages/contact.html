@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Contact Us - Sawacom{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'pages/pages.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="pages-container">
+  <h1>Contact Us</h1>
+
+  <p>
+    We'd love to hear from you! Whether you have feedback, questions, or need support,
+    reach out to us and we'll get back to you as soon as possible.
+  </p>
+
+  <h2>Email</h2>
+  <p>
+    For general inquiries and support, email us at <a href="mailto:support@sawacom.example.com">support@sawacom.example.com</a>.
+  </p>
+
+  <h2>Phone</h2>
+  <p>
+    You can call our support line at <strong>+123 456 7890</strong> (available Mon–Fri, 9am–5pm UTC).
+  </p>
+
+  <h2>Office Address</h2>
+  <p>
+    Sawacom Headquarters<br>
+    123 Wellness Way<br>
+    Nairobi, Kenya
+  </p>
+
+  <h2>Feedback Form</h2>
+  <p>
+    If you prefer, fill out our <a href="#">online feedback form</a> and we'll respond promptly.
+  </p>
+</section>
+{% endblock %}

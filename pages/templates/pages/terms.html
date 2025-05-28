@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Terms of Use - Sawacom{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'pages/pages.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="pages-container">
+  <h1>Terms of Use</h1>
+
+  <p>
+    Welcome to <strong>Sawacom</strong>. By accessing or using our service, you agree to comply with and be bound by these Terms of Use. Please read them carefully.
+  </p>
+
+  <h2>1. Acceptance of Terms</h2>
+  <p>
+    By using Sawacom, you affirm that you are at least 18 years old (or the age of majority in your jurisdiction) and have the legal capacity to agree to these terms.
+  </p>
+
+  <h2>2. Service Description</h2>
+  <p>
+    Sawacom provides an AI-driven mental health assistant designed to offer empathetic conversation, mood tracking, and self-care guidance. It is not a substitute for professional medical advice or therapy.
+  </p>
+
+  <h2>3. User Responsibilities</h2>
+  <p>
+    You agree to use Sawacom lawfully and ethically. You will not post harmful, illegal, or abusive content, nor attempt to compromise the system’s integrity.
+  </p>
+
+  <h2>4. Privacy and Data</h2>
+  <p>
+    Your privacy matters. All conversations are anonymous and encrypted. For details, see our <a href="{% url 'pages:privacy' %}">Privacy Policy</a>.
+  </p>
+
+  <h2>5. Intellectual Property</h2>
+  <p>
+    All content, trademarks, and logos on Sawacom are the property of Sawacom or its licensors. You may not reproduce or redistribute any materials without prior written permission.
+  </p>
+
+  <h2>6. Limitation of Liability</h2>
+  <p>
+    In no event shall Sawacom or its team be liable for any indirect, special, incidental, or consequential damages arising from your use of the service.
+  </p>
+
+  <h2>7. Modifications to Terms</h2>
+  <p>
+    We may update these Terms of Use periodically. Continued use of Sawacom after changes implies acceptance of the revised terms.
+  </p>
+
+  <h2>8. Governing Law</h2>
+  <p>
+    These terms are governed by the laws of your jurisdiction. Any disputes will be resolved in the appropriate local courts.
+  </p>
+
+  <h2>9. Contact Us</h2>
+  <p>
+    If you have questions about these Terms, please <a href="{% url 'pages:contact' %}">contact us</a>.
+  </p>
+</section>
+{% endblock %}

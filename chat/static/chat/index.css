@@ -12,18 +12,23 @@
 
 .chat-start{
     margin: auto 0;
+    width: 100%;
 }
 
 .chat-start .logo{
    display: flex;
    justify-content: center;
-    margin-bottom: 1.5rem;
+   margin-bottom: 1.5rem;
 }
 
 .chat-start .logo img{
     width: 10rem;
     height: 10rem;
 } 
+
+.welcome-message{
+    width: 100%;
+}
 
 .welcome-message .subtext-rotator {
     position: relative;
@@ -253,7 +258,7 @@
 
   @media (max-width: 1024px) {
     .index{
-        padding: 0 1.5rem;
+        padding: 0 1rem;
     }   
 }
 

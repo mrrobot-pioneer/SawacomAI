@@ -9,11 +9,17 @@
 <aside class="sidebar">
     <div class="sidebar-top">
         <div class="upper">
-            <img src="{% static 'images/logo.png' %}" alt="Sawacom Logo" class="logo-image"/>
-            <h1>Sawacom</h1>
+            <a href="{% url 'chats:index' %}">
+                <img src="{% static 'images/logo.png' %}" alt="Sawacom Logo" class="logo-image"/>
+            </a>
+            
+            <a href="{% url 'chats:index' %}">
+                <h1>Sawacom</h1>
+            </a>
+
             <!-- Collapse button in desktop-->
-            <div class="sidebar-collapse">
-                <i class="fa-solid fa-chevron-left" id="sidebarCollapse"></i>
+            <div class="sidebar-collapse" id="sidebarCollapse">
+                <i class="fa-solid fa-chevron-left"></i>
                 <span class="tooltip">Close sidebar</span>
             </div>
             <!-- Close button for mobile -->
@@ -100,10 +106,10 @@
         <nav>
             <ul class="sidebar-links">
                 <li><a href="#">Book a Professional</a></li>
-                <li><a href="#">About Sawacom</a></li>
-                <li><a href="#">Contact Us</a></li>
-                <li><a href="#">Terms of Service</a></li>
-                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="{% url 'pages:about' %}">About Sawacom</a></li>
+                <li><a href="{% url 'pages:contact' %}">Contact Us</a></li>
+                <li><a href="{% url 'pages:terms' %}">Terms of Service</a></li>
+                <li><a href="{% url 'pages:privacy' %}">Privacy Policy</a></li>
               </ul>
             
         </nav>
@@ -111,7 +117,7 @@
         <p class="disclaimer small-text">
             Sawacom is an AI assistant and not a licensed professional. 
             For emergencies, call 999 or <a href="#">Book a professional</a>. 
-            By messaging Sawacom, you agree to our <a href="#">Terms of Service</a> & <a href="#">Privacy Policy</a>.
+            By messaging Sawacom, you agree to our <a href="{% url 'pages:terms' %}">Terms of Service</a> & <a href="{% url 'pages:privacy' %}">Privacy Policy</a>.
         </p>
         
     </div>

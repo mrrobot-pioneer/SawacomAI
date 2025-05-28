@@ -31,7 +31,9 @@
   
 html {
     font-size: 62.5%;
-    scrollbar-gutter: stable both-edges;
+    width: 100vw;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
 }
   
 body {
@@ -44,6 +46,38 @@ body {
 
 main {
     flex: 1;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+ 
+h2 {
+    font-size: 2rem;  
+    font-weight: 600;
+    line-height: 1.4;
+}
+ 
+h3 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+ 
+h4 {
+    font-size: 1.6rem;
+    font-weight: 500;
+    line-height: 1.4;
+}
+ 
+h5 {
+    font-size: 1.4rem;
+    font-weight: 500;
+    line-height: 1.4;
 }
 
 p{
@@ -58,11 +92,6 @@ a{
 a:hover{
     color: var(--text-faded);
     text-decoration: underline;
-}
-
-h1{
-    font-size: 2.5rem;
-    font-weight: 700;
 }
 
 /* Global scrollbar styles */
@@ -172,7 +201,6 @@ h1{
     justify-content: space-between;
     align-items: center;
     height: 6rem;
-    padding: 0 1rem;
     background-color: var(--bg-color);
     position: sticky;
     top: 0;
@@ -301,6 +329,7 @@ h1{
     height: 100vh; 
     position: sticky;
     top: 0;
+    left: 0;
     align-self: flex-start;
     transition: all 0.15s ease-in-out;
 }
@@ -337,6 +366,11 @@ h1{
 .sidebar-top .logo-image{
     width: 3.8rem;
     aspect-ratio: 1/1;
+}
+
+.sidebar-top a {
+    text-decoration: none;
+    color: var(--text-color);
 }
 
 .sidebar-top h1 {
@@ -556,6 +590,12 @@ h1{
         width: 5px;
         height: 5px; 
     }
+
+    h1 { font-size: 2.3rem; }
+    h2 { font-size: 1.9rem; }
+    h3 { font-size: 1.7rem; }
+    h4 { font-size: 1.5rem; }
+    h5 { font-size: 1.3rem; }
     
     .tooltip{
         display: none !important;

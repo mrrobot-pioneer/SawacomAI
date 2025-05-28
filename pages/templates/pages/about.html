@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}About Us - Sawacom{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'pages/pages.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="pages-container">
+  <h1>About Sawacom</h1>
+
+  <p>
+    <strong>Sawacom</strong> is your friendly, accessible mental health AI assistant —
+    built to listen, guide, and support your emotional wellbeing when you need it most.
+    Whether you're feeling anxious, overwhelmed, or simply need someone to talk to,
+    Sawacom is here 24/7 to provide a compassionate ear and helpful guidance.
+  </p>
+
+  <h2>Our Mission</h2>
+  <p>
+    We believe mental health support should be safe, stigma-free, and always available.
+    Our mission is to harness the power of AI to make emotional wellbeing more
+    approachable and personalized for everyone — no matter where you are in your journey.
+  </p>
+
+  <h2>How It Works</h2>
+  <p>
+    Sawacom uses advanced natural language understanding to engage in meaningful conversations.
+    It can help you reflect on your emotions, track your mental health goals, and even connect you
+    with professional therapists when needed.
+  </p>
+
+  <h2>Privacy First</h2>
+  <p>
+    All conversations are anonymous and encrypted. We do not store personal data without consent,
+    and you're always in control of your privacy. Learn more in our <a href="{% url 'pages:privacy' %}">Privacy Policy</a>.
+  </p>
+
+  <h2>Get Involved</h2>
+  <p>
+    We're constantly improving. If you'd like to share feedback, partner with us, or support our mission,
+    please <a href="{% url 'pages:contact' %}">get in touch</a>.
+  </p>
+</section>
+{% endblock %}
