@@ -208,6 +208,7 @@ h1{
     color: var(--text-faded);
 }
 
+/* user account */
 .header .account{
     margin-left: auto;
     position: relative;
@@ -219,6 +220,18 @@ h1{
     font-size: 2.5rem;
     color: var(--text-faded);
     cursor: pointer;
+}
+
+.account-icon:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+    right: 0;
+    left: unset;
+    transform: translateX(0);
+}
+
+.account-icon.open .account-dropdown {
+    display: flex;
 }
  
 /* the dropdown menu, hidden by default */
@@ -236,10 +249,6 @@ h1{
     overflow: hidden;
     width: max-content;
     z-index: 100;
-}
-
-.account-icon.open .account-dropdown {
-    display: flex;
 }
   
 .account-dropdown li {
