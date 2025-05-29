@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Confirm Account Deletion - Sawacom{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'users/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="auth-container" id="delete-account-section">
+  <h1>Delete Your Account</h1>
+
+  <p class="warning-text">
+    <strong>Warning:</strong> This action <strong>cannot</strong> be undone. <br>
+    All your data—including chat history, appointments, and personal settings—will be permanently deleted.
+  </p>
+
+  <br>
+
+  <p>If you’re sure you want to proceed, click the button below to confirm.</p>
+
+  <form method="post" action="{% url 'users:delete_account' %}">
+    {% csrf_token %}
+    <div class="button-group">
+      <button type="submit" class="submit-btn primary-btn danger">Yes, delete my account</button>
+      <a href="{% url 'chats:index' %}" class="submit-btn primary-btn neutral">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

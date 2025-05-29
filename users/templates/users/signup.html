@@ -13,35 +13,72 @@ Signup securely to Sawacom | 24/7 AI Mental Health Companion
 {% block content %}
 
 <section class="auth-container" id="signup-section">
-    <h1>Create Account</h1>
-    <form>
-        <div class="input-group">
-            <label for="login-email">Email address</label>
-            <input type="email" id="signup-email" placeholder="Enter your email address" required>
-        </div>
+  <h1>Create Account</h1>
+  <form method="post" action="{% url 'users:signup' %}">
+    {% csrf_token %}
 
-        <div class="input-group">
-            <label for="login-password">Password</label>
-            <input type="password" id="signup-password" placeholder="Enter your password" required>
-        </div>
-
-        <div class="input-group">
-            <label for="signup-password">Confirm Password</label>
-            <input type="password" id="signup-password" placeholder="Confirm Password" required>
-        </div>
-
-      <button type="submit" class="submit-btn primary-btn">Sign up</button>
-      <p class="subtitle">Already have an account? <a href="{% url 'users:login' %}">Log in</a></p>
-
-      <div class="divider"><span>OR</span></div>
-
-      <div class="social-btns">
-        <button type="button" class="social-btn">
-          <span class="social-icon"><img src="{% static 'images/icons/google-icon.svg' %}" alt="Google icon" width="30"></span>
-          Continue with Google
-        </button>
+    {# Display form-wide errors #}
+    {% if form.non_field_errors %}
+      <div class="alert error">
+        {% for error in form.non_field_errors %}
+          <p>&#x25CF; {{ error }}</p>
+        {% endfor %}
       </div>
-    </form>
-  </section>
+    {% endif %}
+
+    <div class="input-group">
+      {{ form.email.label_tag }}
+      {{ form.email }}
+      {% if form.email.errors %}
+        <div class="alert error">
+          {% for error in form.email.errors %}
+            <p>&#x25CF; {{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="input-group">
+      {{ form.password1.label_tag }}
+      {{ form.password1 }}
+      {% if form.password1.errors %}
+        <div class="alert error">
+          {% for error in form.password1.errors %}
+            <p>&#x25CF; {{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="input-group">
+      {{ form.password2.label_tag }}
+      {{ form.password2 }}
+      {% if form.password2.errors %}
+        <div class="alert error">
+          {% for error in form.password2.errors %}
+            <p>&#x25CF; {{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <button type="submit" class="submit-btn primary-btn">Sign up</button>
+
+    <p class="subtitle">
+      Already have an account? <a href="{% url 'users:login' %}">Log in</a>
+    </p>
+
+    <div class="divider"><span>OR</span></div>
+
+    <div class="social-btns">
+      <button type="button" class="social-btn">
+        <span class="social-icon">
+          <img src="{% static 'images/icons/google-icon.svg' %}" alt="Google icon" width="30">
+        </span>
+        Continue with Google
+      </button>
+    </div>
+  </form>
+</section>
 
 {% endblock %}

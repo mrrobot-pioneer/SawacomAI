@@ -34,25 +34,34 @@
     border: 1px solid var(--input-border);
     border-radius: 3rem;
     background: var(--input-bg);
-  }
+}
 .auth-container .submit-btn {
     display: block;
     width: 100%;
     color: #fff;
     background: var(--primary-color);
     margin-top: 1.5rem;
-  }
+}
 .auth-container .submit-btn:hover {
     opacity: .8;
     background: var(--primary-color);
     color: #fff;
-  }
+}
+.auth-container .submit-btn.danger{
+  background-color: var(--error-bg);
+  color: var(--error-text);
+}
+.auth-container .submit-btn.neutral{
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    text-align: center;
+}
 .auth-container p.subtitle {
     text-align: center;
     font-size: 1.35rem;
     color: var(--text-faded);
     margin-top: 1rem;
-  }
+}
 .auth-container .divider {
     text-align: center;
     margin: 1.5rem 0;

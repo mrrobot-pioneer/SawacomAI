@@ -1,15 +1,29 @@
 /*** Header and Sidebar functionalty ****/
 
-// account dropdown toggle
+// Grab the account icon (if it exists for logged-in users)
 const accountIcon = document.getElementById('accountIcon');
-accountIcon.addEventListener('click', e => {
-  e.stopPropagation();             
-  accountIcon.classList.toggle('open');
-});
 
-// close account dropdown when clicking outside
-document.addEventListener('click', () => {
-  accountIcon.classList.remove('open');
+if (accountIcon) {
+  // account dropdown toggle
+  accountIcon.addEventListener('click', e => {
+    e.stopPropagation();
+    accountIcon.classList.toggle('open');
+  });
+
+  // close account dropdown when clicking outside
+  document.addEventListener('click', () => {
+    accountIcon.classList.remove('open');
+  });
+}
+
+// close messsage
+document
+  .querySelectorAll('.messages .close-btn')
+  .forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      btn.closest('.message').remove();
+    });
 });
 
 

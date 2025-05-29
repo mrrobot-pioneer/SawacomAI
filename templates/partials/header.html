@@ -1,32 +1,47 @@
-<!-- Base Header [styles in base.css]-->
-
 <header class="header">
-    <div class="sidebar-toggle" id="sidebarToggle">
-        <i class="fa-solid fa-bars"></i>
-        <span class="tooltip">Open sidebar</span>
+    <div class="sidebar-toggle" id="sidebarToggle">  
+      <i class="fa-solid fa-bars"></i>
+      <span class="tooltip">Open sidebar</span>
     </div>
-
+  
     <div class="account">
-        <!-- <a href="#" class="primary-btn login-btn">
-            Log in
-        </a> -->
-
+      {% if user.is_authenticated %}
         <div class="account-icon" id="accountIcon">
-            <i class="fa-solid fa-user-circle fa-2x"></i>
-            <span class="tooltip">Account</span>
-            <ul class="account-dropdown slide-in" id="accountDropdown">
-                <li class="username">
-                    <i class="fa-solid fa-user"></i> <span>John Doe</span>
-                </li>
-                <li>
-                    <i class="fa-solid fa-calendar-check"></i> <a href="#">Appointments</a>
-                </li>
-                <li>
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i> <a href="#">Logout</a></li>
-                <li class="delete-account">
-                    <i class="fa-solid fa-trash-alt"></i> <a href="#">Delete Account</a>
-                </li>
-            </ul>
-          </div>
+          <i class="fa-solid fa-user-circle fa-2x"></i>
+          <span class="tooltip">Account</span>
+          <ul class="account-dropdown slide-in" id="accountDropdown">
+            <li>
+              <a href="#" class="username">
+                <i class="fa-solid fa-user"></i>
+                <span>{{ user.email }}</span>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="fa-solid fa-calendar-check"></i>
+                <span>Appointments</span>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'users:logout' %}">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Logout</span>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'users:delete_account' %}" class="delete-account">
+                <i class="fa-solid fa-trash-alt"></i>
+                <span>Delete Account</span>
+              </a>
+            </li>
+          </ul>
+          
+        </div>
+      {% else %}
+        <a href="{% url 'users:login' %}" class="primary-btn login-btn">
+          Log in
+        </a>
+      {% endif %}
     </div>
-</header>
+  </header>
+  

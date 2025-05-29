@@ -193,6 +193,67 @@ a:hover{
     animation: fadeIn 0.15s ease-in-out both;
 }
 
+/* alerts */
+.alert{
+    background-color: var(--success-bg);
+    color: var(--success-text);
+    padding: .5rem;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+.alert.success{
+    background-color: var(--success-bg);
+    color: var(--success-text);
+}
+.alert.error{
+    background-color: var(--error-bg);
+    color: var(--error-text);
+}
+.alert.warning{
+    background-color: var(--warning-bg);
+    color: var(--warning-text);
+}
+
+/* messages */
+.messages {
+    list-style: none;
+    padding: 0;
+    position: fixed;
+    top: 6rem;
+    width: 100%;
+    right: 0;
+    z-index: 10;
+  }
+  
+.message {
+    padding: 1rem;
+    font-size: 1.35rem;
+    padding-right: 4rem;
+    text-align: center;
+    position: relative;
+}
+  
+.message.success { background-color: var(--success-bg); color: var(--success-text); }
+.message.error   { background-color: var(--error-bg);   color: var(--error-text); }
+.message.info { background-color: var(--warning-bg); color: var(--warning-text); }
+  
+.close-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 1.2rem;
+    border: none;
+    font-size: 3.5rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--text-faded);
+}
+.close-btn:hover {
+    color: var(--text-color);
+}
+
 
 /* Header */
 .header{
@@ -280,37 +341,43 @@ a:hover{
     z-index: 100;
 }
   
-.account-dropdown li {
+.account-dropdown li a{
+    text-decoration: none;
+    color: var(--text-color);
+    width: 100%;
     display: flex;
     align-items: center;
     gap: 1rem;
     padding: 1rem;
     font-size: 1.35rem;
     border-radius:1rem;
+
 }
-.account-dropdown li i {
-    font-size: 1.5rem;
-}
-.account-dropdown li a{
-    text-decoration: none;
-    color: var(--text-color);
-}
-.account-dropdown li:hover {
+.account-dropdown li a:hover {
     background-color: var(--input-bg);
 }
-.account-dropdown li.username{
+
+.account-dropdown li a i {
+    font-size: 1.5rem;
+}
+
+.account-dropdown li a.username{
+    display: inline-block;     
+    max-width: 20rem;          
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     border-bottom: 1px solid var(--input-border);
     border-radius: 0;
-    margin-bottom: .5rem;
     cursor: auto;
 }
-.account-dropdown li.username:hover{
+.account-dropdown li a.username:hover{
     background-color: transparent;
 }
-.account-dropdown li.delete-account, .account-dropdown li.delete-account a{
+.account-dropdown li a.delete-account, .account-dropdown li a.delete-account{
     color: var(--error-text);
 }
-.account-dropdown li.delete-account:hover{
+.account-dropdown li a.delete-account:hover{
     color: var(--error-text);
     background-color: var(--error-bg);
 }
@@ -332,6 +399,7 @@ a:hover{
     left: 0;
     align-self: flex-start;
     transition: all 0.15s ease-in-out;
+    z-index: 1000;
 }
 
 /* Collapsed sidebar (desktop) */
