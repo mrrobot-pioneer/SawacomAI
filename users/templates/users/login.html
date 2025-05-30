@@ -2,6 +2,8 @@
 
 {% load static %}
 
+{% load socialaccount %}
+
 {% block title %}
 Login securely to Sawacom | 24/7 AI Mental Health Companion
 {% endblock %}
@@ -61,12 +63,12 @@ Login securely to Sawacom | 24/7 AI Mental Health Companion
     <div class="divider"><span>OR</span></div>
 
     <div class="social-btns">
-      <button type="button" class="social-btn">
+      <a href="{% provider_login_url 'google' %}" class="social-btn">
         <span class="social-icon">
           <img src="{% static 'images/icons/google-icon.svg' %}" alt="Google icon" width="30">
         </span>
         Continue with Google
-      </button>
+      </a>
     </div>
   </form>
 </section>

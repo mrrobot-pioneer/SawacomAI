@@ -12,9 +12,13 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -44,6 +48,18 @@ INSTALLED_APPS = [
     'pages',
     'blog',
     'django_ckeditor_5',
+    'django.contrib.sites',               
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+]
+
+SITE_ID = 1 
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # default
+    'allauth.account.auth_backends.AuthenticationBackend', #social auth
 ]
 
 MIDDLEWARE = [
@@ -55,6 +71,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'sawacom.urls'
@@ -139,21 +156,30 @@ MEDIA_ROOT = BASE_DIR / 'media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+# Allauth settings
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/'       
 LOGOUT_REDIRECT_URL = '/'  
 
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
 
-# CKEditor settings
-CKEDITOR_5_CONFIGS = {
-    'default': {
-       
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+SOCIALACCOUNT_PROVIDERS = {
+  'google': {
+    'APP': {
+      'client_id': os.getenv('GOOGLE_CLIENT_ID'),
+      'secret':   os.getenv('GOOGLE_CLIENT_SECRET'),
+      'key':      ''
     }
+  }
 }
 
 
-
+# CKEditor5 settings
 CKEDITOR_5_CONFIGS = {
     'default': {
         'toolbar': [

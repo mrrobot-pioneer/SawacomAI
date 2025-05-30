@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import SignUpForm, LoginForm
-from django.contrib.auth import login as auth_login, logout as auth_logout
+from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate
 from django.contrib.auth.decorators import login_required
 
 def signup(request):
@@ -12,11 +12,19 @@ def signup(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            auth_login(request, user)
+            # re-authenticate
+            user = authenticate(
+                request,
+                username=user.username,
+                password=form.cleaned_data.get('password1')
+            )
 
-            messages.success(request, "Your account has been created successfully!")
-
-            return redirect('chats:index')  
+            if user is not None:
+                auth_login(request, user)
+                messages.success(request, "Your account has been created successfully!")
+                return redirect('chats:index')
+            else:
+                messages.error(request, "Authentication failed. Please try logging in.")
     else:
         form = SignUpForm()
 

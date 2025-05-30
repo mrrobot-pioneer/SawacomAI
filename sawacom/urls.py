@@ -12,6 +12,9 @@ urlpatterns = [
     # Auth and user profiles
     path('users/', include('users.urls')),
 
+    #social authentication => Google
+    path('accounts/', include('allauth.urls')),
+
     # Static pages like /about, /contact
     path('', include('pages.urls')), 
 
