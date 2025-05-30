@@ -41,7 +41,9 @@ INSTALLED_APPS = [
     'chat',
     'booking',
     'users',
-    'pages'
+    'pages',
+    'blog',
+    'django_ckeditor_5',
 ]
 
 MIDDLEWARE = [
@@ -111,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Nairobi'
 
 USE_I18N = True
 
@@ -128,6 +130,10 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",  # Global static files
 ]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media/'
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -137,3 +143,36 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/'       
 LOGOUT_REDIRECT_URL = '/'  
+
+
+# CKEditor settings
+CKEDITOR_5_CONFIGS = {
+    'default': {
+       
+    }
+}
+
+
+
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': [
+            'heading', '|',
+            'bold', 'italic', 'link', '|',
+            'bulletedList', 'numberedList', '|',
+            'blockQuote', 'undo', 'redo',
+        ],
+        'language': 'en',
+        'heading': {
+            'options': [
+                { 'model': 'paragraph',  'view': 'p',  'title': 'Paragraph' },
+                { 'model': 'heading1',   'view': 'h1', 'title': 'Heading 1' },
+                { 'model': 'heading2',   'view': 'h2', 'title': 'Heading 2' },
+                { 'model': 'heading3',   'view': 'h3', 'title': 'Heading 3' },
+                { 'model': 'heading4',   'view': 'h4', 'title': 'Heading 4' },
+                { 'model': 'heading5',   'view': 'h5', 'title': 'Heading 5' },
+                { 'model': 'heading6',   'view': 'h6', 'title': 'Heading 6' },
+            ]
+        },
+    }
+}

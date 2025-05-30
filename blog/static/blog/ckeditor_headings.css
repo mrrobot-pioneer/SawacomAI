@@ -1,0 +1,21 @@
+.ck-editor__editable h1, .ck-editor__editable h2, .ck-editor__editable h3 {
+    font-weight: 700 !important;
+    line-height: 1.4 !important;
+}
+
+.ck-editor__editable h1 {
+    font-size: 25px !important;
+}
+ 
+.ck-editor__editable h2 {
+    font-size: 18px !important;  
+}
+ 
+.ck-editor__editable h3 {
+    font-size: 15px !important;
+}
+
+.ck-editor__editable p{
+    font-size: 13.5px;
+    font-weight: 400;
+}  

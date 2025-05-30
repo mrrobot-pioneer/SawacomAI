@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ post.title }} – Sawacom{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'blog/detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="blog-detail-container">
+  <h1>{{ post.title }}</h1>
+
+  <p class="post-meta">
+    Created on: <time datetime="{{ post.created_at|date:'Y-m-d' }}">{{ post.created_at|date:"F j, Y" }}</time>
+    {% if post.author %}
+    <span class="separator" style="height: .3rem;"></span>
+    by {{ post.author.get_full_name|default:post.author }}
+    {% endif %}
+    </small>
+  </p>
+
+  {% if post.thumbnail %}
+  <div class="detail-thumb">
+    <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}">
+  </div>
+  {% endif %}
+
+  <div class="post-content">
+    {{ post.content|safe }}
+  </div>
+</section>
+{% endblock %}

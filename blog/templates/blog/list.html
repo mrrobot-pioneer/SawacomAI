@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% load static blog_extras %}
+
+{% block title %}Blog – Sawacom{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'blog/list.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="blog-list-container">
+  <h1>Our Blog</h1>
+
+  <div class="blog-wrapper">
+    {% for post in posts %}
+      <article class="blog-card">
+        <a href="{% url 'blog:detail' slug=post.slug %}" class="card-thumb">
+          <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}">
+        </a>
+        <div class="card-content">
+          <h2 class="card-title">
+            <a href="{% url 'blog:detail' slug=post.slug %}">{{ post.title }}</a>
+          </h2>
+          <p class="card-meta">
+            Created on:<time datetime="{{ post.created_at|date:'Y-m-d' }}">{{ post.created_at|date:"F j, Y" }}</time>
+          </p>
+          <div class="card-excerpt">
+            {{ post.content|first_paragraph }}
+          </div>            
+          <a href="{% url 'blog:detail' slug=post.slug %}" class="primary-btn read-more">
+            Read more <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+      </article>
+    {% empty %}    
+      <p>No blog posts available at the moment. Check back soon!</p>
+    {% endfor %}
+  </div>
+
+  <nav class="pagination">
+    <!-- Prev link  -->
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}" class="page-link prev">
+        <i class="fa-solid fa-chevron-left"></i> Prev
+      </a>
+    {% else %}
+      <span class="page-link prev disabled">
+        <i class="fa-solid fa-chevron-left"></i> Prev
+      </span>
+    {% endif %}
+  
+    <!-- Page numbers  -->
+    {% for num in page_obj.paginator.page_range %}
+      {% if num == page_obj.number %}
+        <span class="page-link current">{{ num }}</span>
+      {% else %}
+        <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+      {% endif %}
+    {% endfor %}
+  
+    <!-- Next link -->
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}" class="page-link next">
+        Next <i class="fa-solid fa-chevron-right"></i>
+      </a>
+    {% else %}
+      <span class="page-link next disabled">
+        Next <i class="fa-solid fa-chevron-right"></i>
+      </span>
+    {% endif %}
+  </nav>
+  
+</section>
+{% endblock %}
