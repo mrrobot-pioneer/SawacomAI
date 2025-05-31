@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'users',
     'pages',
     'blog',
+    'rest_framework',
     'django_ckeditor_5',
     'django.contrib.sites',               
     'allauth',

@@ -13,9 +13,7 @@
 <div class="index">
     <!-- Chat area when users sends message -->
     <div class="chat-body" id="chatBody">
-        <div class="messages" id="messages">
             <!-- Messages will be dynamically inserted here -->
-        </div>
     </div>
 
     <!-- initial display when no chats yet -->
@@ -71,5 +69,7 @@
 
 
 {% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
+    <script src="{% static 'chat/helpers.js' %}" defer></script>
     <script src="{% static 'chat/index.js' %}" defer></script>
 {% endblock %}

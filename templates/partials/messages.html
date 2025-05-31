@@ -1,7 +1,7 @@
 {% if messages %}
-  <ul class="messages">
+  <ul class="global-messages">
     {% for msg in messages %}
-      <li role="alert" class="message {{ msg.tags }}">
+      <li role="alert" class="global-message {{ msg.tags }}">
         {{ msg }}                     
         <span class="close-btn">&times;</span>
       </li>

@@ -6,23 +6,12 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     
-    # Chat at root (e.g. homepage, chat flow)
-    path('', include('chat.urls')),
-
-    # Auth and user profiles
-    path('users/', include('users.urls')),
-
-    #social authentication => Google
-    path('accounts/', include('allauth.urls')),
-
-    # Static pages like /about, /contact
-    path('', include('pages.urls')), 
-
-    # Blog section for articles, posts, etc.
-    path('blog/', include('blog.urls')), 
-
-    #ckeditor for rich text editing
-    path("ckeditor5/", include('django_ckeditor_5.urls')),
+    path('', include('chat.urls')), # Chat at root (e.g. homepage, chat flow)
+    path('users/', include('users.urls')), # Auth and user profiles
+    path('accounts/', include('allauth.urls')), # social authentication => Google
+    path('', include('pages.urls')), # Static pages like /about, /contact
+    path('blog/', include('blog.urls')), # Blog section for articles, posts, etc. 
+    path("ckeditor5/", include('django_ckeditor_5.urls')), #ckeditor for rich text editing
 ]
 
 if settings.DEBUG:

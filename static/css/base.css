@@ -204,7 +204,7 @@ a:hover{
 }
 
 /* messages */
-.messages {
+.global-messages {
     list-style: none;
     padding: 0;
     position: fixed;
@@ -214,7 +214,7 @@ a:hover{
     z-index: 10;
   }
   
-.message {
+.global-message {
     padding: 1rem;
     font-size: 1.35rem;
     padding-right: 4rem;
@@ -222,11 +222,11 @@ a:hover{
     position: relative;
 }
   
-.message.success { background-color: var(--success-bg); color: var(--success-text); }
-.message.error   { background-color: var(--error-bg);   color: var(--error-text); }
-.message.info { background-color: var(--warning-bg); color: var(--warning-text); }
+.global-message.success { background-color: var(--success-bg); color: var(--success-text); }
+.global-message.error   { background-color: var(--error-bg);   color: var(--error-text); }
+.global-message.info { background-color: var(--warning-bg); color: var(--warning-text); }
   
-.close-btn {
+.global-message .close-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -237,7 +237,7 @@ a:hover{
     cursor: pointer;
     color: var(--text-faded);
 }
-.close-btn:hover {
+.global-message .close-btn:hover {
     color: var(--text-color);
 }
 

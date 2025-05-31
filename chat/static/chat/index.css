@@ -88,13 +88,12 @@
     padding-bottom: 1.5rem;
 }
   
-.chat-body .message {
+.chat-body .chat-message {
     display: flex;
     gap: 1rem;
-    align-items: center;
 }
   
-.chat-body .message .bot-avatar {
+.chat-body .chat-message .bot-avatar {
     width: 3.5rem;
     height: 3.5rem;
     padding: .6rem;
@@ -106,12 +105,16 @@
     background: var(--primary-color);
 }
   
-.chat-body .message .message-text {
+.chat-body .chat-message .message-text {
     padding: 1.2rem 1.5rem;
     max-width: 75%;
     font-size: 1.35rem;
     font-weight: 400;
     color: var(--text-color);
+}
+.chat-body .chat-message .message-text.error {
+    color: var(--error-text);
+    background: var(--error-bg);
 }
   
 .chat-body .bot-message.thinking .message-text {

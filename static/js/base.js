@@ -18,11 +18,11 @@ if (accountIcon) {
 
 // close messsage
 document
-  .querySelectorAll('.messages .close-btn')
+  .querySelectorAll('.global-messages .close-btn')
   .forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
-      btn.closest('.message').remove();
+      btn.closest('.global-message').remove();
     });
 });
 
