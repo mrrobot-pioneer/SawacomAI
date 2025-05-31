@@ -48,6 +48,8 @@
   const chatBody   = document.getElementById('chatBody');
 
   let generating = false; // true while awaiting bot response
+  let currentSessionId = null;
+
 
   // Initial focus + button state
   textarea.focus();
@@ -63,6 +65,43 @@
     if (!generating) updateSendButtonState(generating);
   });
 
+
+  function loadSessionMessages(sessionId) {
+    // As soon as a session is clicked, remove the welcome screen
+    activateChatLayout();
+
+    axios.get(`/chat-sessions/${sessionId}/messages/`)
+      .then(response => {
+        const messages = response.data; // array of { id, sender, content, created_at }
+        currentSessionId = sessionId;
+        renderChatWindow(messages);
+        // Also update the “active” state in the sidebar:
+        if (typeof window.highlightActiveSession === 'function') {
+          window.highlightActiveSession(sessionId);
+        }
+      })
+      .catch(err => {
+        console.error(`Error loading messages for session ${sessionId}:`, err);
+      });
+  }
+
+
+  function renderChatWindow(messages) {
+    chatBody.innerHTML = ''; // clear existing bubbles
+
+    messages.forEach(msg => {
+      const bubble = document.createElement('div');
+      bubble.classList.add('chat-message', msg.sender === 'user' ? 'user-message' : 'bot-message');
+      bubble.innerHTML = `<div class="message-text">${msg.content}</div>`;
+      chatBody.appendChild(bubble);
+    });
+
+    scrollChatToBottom();
+  }
+
+    // Expose to the global window so sidebar.js can call them:
+    window.loadSessionMessages = loadSessionMessages;
+    window.renderChatWindow     = renderChatWindow;
 
   // ——————————————————————————————————————————————
   // SECTION D: Insert “Thinking” Bubble & Handle Fetch Inline
@@ -87,10 +126,26 @@
     chatBody.appendChild(thinkingBubble);
     scrollChatToBottom();
 
+    // Build payload including session_id (if already set)
+    const payload = { message: userMessage };
+    if (currentSessionId) {
+      payload.session_id = currentSessionId;
+    }
+
     // 2. Axios API call to "/simulate/"
     axios.post('/simulate/', { message: userMessage })
     .then(response => {
       const data = response.data;
+
+      // Save new session_id if this was the first message
+      if (data.session_id && !currentSessionId) {
+        currentSessionId = data.session_id;
+        // Tell sidebar.js to refresh its list:
+        if (typeof window.loadSidebarSessions === 'function') {
+          window.loadSidebarSessions();
+        }
+      }
+
       const textEl = thinkingBubble.querySelector('.message-text');
       textEl.innerText = data.reply || "I didn't get that.";
       thinkingBubble.classList.remove('thinking');

@@ -76,28 +76,3 @@ if (overlay) {
     overlay.addEventListener("click", closeSidebar);
 }
 
-// --- Chat Menu Logic ---
-
-function toggleChatOptions(e, menu) {
-    e.stopPropagation();
-
-    document.querySelectorAll(".chat-options").forEach(opt => {
-        opt.style.display = "none";
-    });
-
-    const options = menu.nextElementSibling;
-    options.style.display = options.style.display === "block" ? "none" : "block";
-}
-
-const chatMenus = document.querySelectorAll(".chat-menu");
-
-chatMenus.forEach(menu => {
-    menu.addEventListener("click", (e) => toggleChatOptions(e, menu));
-});
-
-// Close chat options when clicking outside
-document.addEventListener("click", () => {
-    document.querySelectorAll(".chat-options").forEach(opt => {
-        opt.style.display = "none";
-    });
-});

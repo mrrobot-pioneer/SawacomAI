@@ -52,7 +52,9 @@
     </main>
 
     <!-- Global base script -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
     <script src="{% static 'js/base.js' %}" defer></script>
+    <script src="{% static 'chat/chatSessions.js' %}" defer></script>
 
     <!-- Page-specific scripts injected here-->
     {% block scripts %} {% endblock %}

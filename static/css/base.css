@@ -476,33 +476,34 @@ a:hover{
     padding: 0 .7rem 0 1rem;
 }
 
-.sidebar-middle .chats{
+.sidebar-middle .chats-list{
     list-style: none;
     display: flex;
     flex-direction: column;
     gap: .15rem;
 }
 
-.sidebar-middle .chats li {
+.sidebar-middle .chats-list li {
     position: relative;
     padding: .9rem 1rem;
     border-radius: 3rem;
     display: flex;
+    justify-content: space-between;
     align-items: center;
     transition: all 0.1s ease-in-out;
 }
-.sidebar-middle .chats li:hover{
+.sidebar-middle .chats-list li:hover{
     background-color: var(--secondary-color);
     cursor: pointer;
 }
-.sidebar-middle .chats li:first-child{
+.sidebar-middle .chats-list li.active{
     background: var(--secondary-color);
 }
-.sidebar-middle .chats li:first-child .chat-menu{
+.sidebar-middle .chats-list li.active .chat-menu{
     display: inline-block;
 }
 
-.sidebar-middle .chats li a{
+.sidebar-middle .chats-list li .session-title{
     color: var(--text-color);
     font-weight: 400;
     font-size: 1.35rem;
@@ -514,7 +515,7 @@ a:hover{
     position: relative;
 }
 
-.sidebar-middle .chats li .chat-menu{
+.sidebar-middle .chats-list li .chat-menu{
     display: none;
     font-size: 1.4rem;
     padding: .2rem .5rem;
@@ -523,11 +524,11 @@ a:hover{
     color: var(--text-color);
 } 
 
-.sidebar-middle .chats li:hover .chat-menu {
+.sidebar-middle .chats-list li:hover .chat-menu {
     display: inline-block;
 }
 
-.sidebar-middle .chats li .chat-menu:hover{
+.sidebar-middle .chats-list li .chat-menu:hover{
     background-color: var(--bg-color);
     color: var(--primary-color);
 }  
