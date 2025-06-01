@@ -182,8 +182,6 @@ a:hover{
 
 /* alerts */
 .alert{
-    background-color: var(--success-bg);
-    color: var(--success-text);
     padding: .5rem;
     border-radius: 1rem;
     display: flex;
@@ -201,6 +199,30 @@ a:hover{
 .alert.warning{
     background-color: var(--warning-bg);
     color: var(--warning-text);
+}
+
+.retry-btn{
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding: .5rem 1rem;
+    border-radius: 1rem;
+    font-size: 1.35rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .5rem;
+    transition: all 0.1s ease-in-out;
+}
+.retry-btn:hover {
+    cursor: pointer;
+    opacity: 0.85;
+}
+
+.retry-btn i {
+    font-size: 1.5rem;
+    color: var(--text-color);
 }
 
 /* messages */
@@ -584,17 +606,16 @@ a:hover{
     }
 }
 
-.no-chats-message {
-    text-align: center;
+.no-chats-message,.error-chats-message {
     padding: 2rem 1rem;
     color: var(--text-faded);
     display: flex;
     align-items: center;
     gap: 1rem;
-  }
+}
   
-.no-chats-message i {
-    font-size: 2rem;
+.no-chats-message i, .error-chats-message {
+    font-size: 3rem;
   }
 
 .sidebar-bottom{

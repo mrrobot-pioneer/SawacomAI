@@ -80,12 +80,12 @@
   
 
 /* Chat Body*/
-.chat-body {
+.chat-body:not(:empty){
     gap: 2rem;
     width: 100%;
     display: flex;
     flex-direction: column;
-    padding-bottom: 1.5rem;
+    padding-bottom: 3rem;
 }
   
 .chat-body .chat-message {
@@ -178,6 +178,16 @@
     44% {
       opacity: 0.2;
     }
+  }
+
+  .chat-error-banner{
+    width: fit-content;
+    padding: 1rem;
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
   }
 
 

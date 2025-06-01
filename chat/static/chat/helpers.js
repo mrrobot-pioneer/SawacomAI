@@ -65,7 +65,7 @@
 
     if (!inputBoxEl || !chatFooterEl) return;
 
-    if (chatStartEl) chatStartEl.remove();
+    if (chatStartEl) chatStartEl.style.display = 'none';
     chatFooterEl.appendChild(inputBoxEl);
 
     window.hasActivated = true;

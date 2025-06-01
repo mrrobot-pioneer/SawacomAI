@@ -159,13 +159,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Allauth settings
 LOGIN_URL = '/users/login/'
-LOGIN_REDIRECT_URL = '/'       
-LOGOUT_REDIRECT_URL = '/'  
-
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_SIGNUP_FIELDS = [
+    'email*',
+    'password1*',
+    'password2*',
+]
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_USERNAME_REQUIRED = False
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
