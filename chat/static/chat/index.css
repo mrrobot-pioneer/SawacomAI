@@ -126,16 +126,16 @@
     border-radius: 1.3rem 1.3rem 1.3rem 0;
 }
   
-  .chat-body .user-message {
+.chat-body .user-message {
     flex-direction: column;
     align-items: flex-end;
-  }
-  
-  .chat-body .user-message .message-text {
+}
+
+.chat-body .user-message .message-text {
     color: #fff;
     background: var(--primary-color);
     border-radius: 1.3rem 1.3rem 0 1.3rem;
-  }
+}
 
 .chat-body .bot-message .thinking-indicator {
     display: flex;
@@ -143,44 +143,44 @@
     padding-block: 1.5rem;
 }
   
-  .chat-body .bot-message .thinking-indicator .dot {
+.chat-body .bot-message .thinking-indicator .dot {
     height: .7rem;
     width: .7rem;
     opacity: 0.7;
     border-radius: 50%;
     background: var(--primary-color);
     animation: dotPulse 1.8s ease-in-out infinite;
-  }
-  
-  .chat-body .bot-message .thinking-indicator .dot:nth-child(1) {
+}
+
+.chat-body .bot-message .thinking-indicator .dot:nth-child(1) {
     animation-delay: 0.2s;
-  }
-  
-  .chat-body .bot-message .thinking-indicator .dot:nth-child(2) {
+}
+
+.chat-body .bot-message .thinking-indicator .dot:nth-child(2) {
     animation-delay: 0.3s;
-  }
-  
-  .chat-body .bot-message .thinking-indicator .dot:nth-child(3) {
+}
+
+.chat-body .bot-message .thinking-indicator .dot:nth-child(3) {
     animation-delay: 0.4s;
-  }
+}
   
-  @keyframes dotPulse {
+@keyframes dotPulse {
     0%,
     44% {
-      transform: translateY(0);
+        transform: translateY(0);
     }
-  
-    28% {
-      opacity: 0.4;
-      transform: translateY(-4px);
-    }
-  
-    44% {
-      opacity: 0.2;
-    }
-  }
 
-  .chat-error-banner{
+    28% {
+        opacity: 0.4;
+        transform: translateY(-4px);
+    }
+
+    44% {
+        opacity: 0.2;
+    }
+}
+
+.chat-error-banner{
     width: fit-content;
     padding: 1rem;
     flex-direction: row;
@@ -188,7 +188,36 @@
     justify-content: center;
     align-items: center;
     align-self: center;
-  }
+}
+
+
+/* Chat‐body skeleton (message bubbles) */
+.chat-body .skeleton-message {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    margin: 0.5rem 0;
+    max-width: 75%;
+    min-width: 75%;
+}
+.chat-body .skeleton-message.even{
+    margin-left: auto;
+}
+
+.chat-body .skeleton-message .skeleton-avatar {
+    width: 3.5rem;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+}
+
+.chat-body .skeleton-message .skeleton-text {
+    flex: 1;
+    height: 5rem;
+    border-radius: 1.3rem 1.3rem 1.3rem 0;
+}
+.chat-body .skeleton-message.even .skeleton-text {
+    border-radius: 1.3rem 1.3rem 0 1.3rem;
+}
 
 
 /* Chat Input */

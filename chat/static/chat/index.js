@@ -65,6 +65,27 @@
     if (!generating) updateSendButtonState(generating);
   });
 
+
+  function showMessagesLoading() {
+    chatBody.innerHTML = '';
+    for (let i = 0; i < 7; i++) {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('skeleton-message');
+      if (i % 2 === 0) {
+        msgDiv.classList.add('even');
+        msgDiv.innerHTML = `
+        <div class="skeleton-text skeleton-item"></div>
+      `;
+      }else{
+        msgDiv.innerHTML = `
+        <div class="skeleton-avatar skeleton-item"></div>
+        <div class="skeleton-text skeleton-item"></div>
+      `;
+      }
+      chatBody.appendChild(msgDiv);
+    }
+  }
+  
   function loadSessionMessages(sessionId) {
     activateChatLayout();
   
@@ -74,6 +95,8 @@
       params.set('session_id', sessionId);
       window.history.replaceState(null, '', `/?${params.toString()}`);
     }
+
+    showMessagesLoading();
   
     axios.get(`/chat-sessions/${sessionId}/messages/`)
       .then(response => {
@@ -102,7 +125,7 @@
         if (!err.response) {
           banner.innerHTML = `
             <p>Network error. Check your connection and try again.</p>
-            <button id="retryLoadSession" class="retry-btn">
+            <button id="retryLoadSession" class="retry-btn"> onclick="loadSessionMessages('${sessionId}')">
               <i class="fa-solid fa-rotate-right"></i>
               Retry
             </button>
@@ -111,7 +134,7 @@
           // 2b) Otherwise, some other error (e.g. 404, 500)
           banner.innerHTML = `
             <p>Error fetching messages. Please try again.</p>
-            <button id="retryLoadSession" class="retry-btn">
+            <button id="retryLoadSession" class="retry-btn" onclick="loadSessionMessages('${sessionId}')">
               <i class="fa-solid fa-rotate-right"></i>
               Retry
             </button>
@@ -120,18 +143,10 @@
   
         chatBody.appendChild(banner);
   
-        // 3) Wire up the Retry button
-        const retryBtn = document.getElementById('retryLoadSession');
-        retryBtn.addEventListener('click', () => {
-          banner.remove();
-          loadSessionMessages(sessionId);
-        });
-  
         scrollChatToBottom();
       });
   }
   
-
   window.loadSessionMessages = loadSessionMessages; // Expose to global
 
   // Now that loadSessionMessages is attached to window, check the URL:

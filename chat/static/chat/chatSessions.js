@@ -19,8 +19,19 @@
    * - If 200 + empty array: show “No saved chats yet”
    * - Otherwise on error: show “Error loading chats”
    */
+  function showSidebarLoading() {
+    chatsList.innerHTML = '';
+    for (let i = 0; i < 5; i++) {
+      const li = document.createElement('li');
+      li.classList.add('skeleton-item');
+      chatsList.appendChild(li);
+    }
+  }
+
   function loadSidebarSessions() {
     if (!chatsList) return;
+
+    showSidebarLoading();
 
     axios.get('/chat-sessions/')
       .then(response => {
@@ -30,11 +41,14 @@
       .catch(err => {
         if (err.response && err.response.status === 403) {
           renderLoginMessage();
-        } else {
-          renderErrorMessage("Error loading chats. Please try again later.");
+        } else  if(!err.response) {
+          renderErrorMessage("Network error. Please check your connection.");
+        }else {
+          renderErrorMessage("Error loading chats. Please try again.");
         }
       });
   }
+  
 
   /**
    * Show “Log in to access your saved chats” when user is not authenticated.
@@ -72,8 +86,11 @@
     const div = document.createElement('div');
     div.classList.add('error-chats-message');
     div.innerHTML = `
-      <i class="fa-solid fa-triangle-exclamation"></i>
       <p>${msg}</p>
+      <button class="retry-btn" onclick="loadSidebarSessions()">
+        <i class="fa-solid fa-rotate"></i>
+        Retry
+      </button>
     `;
     chatsList.appendChild(div);
   }
@@ -90,6 +107,7 @@
 
     sessions.forEach(sess => {
       const li = document.createElement('li');
+      li.classList.add('chat-session');
       li.dataset.sessionId = sess.id;
 
       // Use the title returned by the backend
