@@ -1,10 +1,10 @@
-import time
 from django.utils.timezone import localtime
 from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 
 from .models import ChatSession, ChatMessage
 from .serializers import ChatSessionSerializer, ChatMessageSerializer
@@ -52,9 +52,6 @@ def simulate_chatbot(request):
         # Save the user’s message
         ChatMessage.objects.create(session=session, sender='user', content=user_msg)
 
-    # Simulate “thinking”
-    time.sleep(1)
-
     bot_reply = simulate_response(user_msg)
 
     if session:
@@ -98,3 +95,51 @@ def list_chat_messages(request, session_id):
     messages = ChatMessage.objects.filter(session=session).order_by('created_at')
     serializer = ChatMessageSerializer(messages, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_chat_session(request, session_id):
+    """
+    DELETE /chat-sessions/<session_id>/delete/
+    Only the owner may delete. On failure, set a Django error message.
+    """
+
+    session = get_object_or_404(ChatSession, id=session_id, user=request.user)
+
+    try:
+        session.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except Exception:
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def rename_chat_session(request, session_id):
+    """
+    PATCH /chat-sessions/<session_id>/rename/
+    Body: { "title": "<new title>" }
+    Only the owner may rename. On failure, return error message.
+    """
+    # 1) Fetch the ChatSession or return 404 if not found / not owned
+    session = get_object_or_404(ChatSession, id=session_id, user=request.user)
+
+    # 2) Extract the new title from request.data
+    new_title = (request.data.get('title') or '').strip()
+    if not new_title:
+        return Response(
+            {'error': 'Title is required.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # 3) Attempt to update
+    session.title = new_title
+    try:
+        session.save()
+        return Response(status=status.HTTP_200_OK)
+    except Exception:
+        return Response(
+            {'error': 'Could not rename chat session.'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

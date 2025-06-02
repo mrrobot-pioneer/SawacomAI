@@ -5,12 +5,24 @@
     background: var(--bg-color);
     border-radius: 1.5rem;
     border: 1px solid var(--input-border);
-  }
+}
+
+#delete-account-section{
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+#delete-account-section form{
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
 
 .auth-container h1 {
     text-align: center;
     margin-bottom: 1rem;
-  }
+}
   
 .auth-container form {
     display: flex;
@@ -47,15 +59,7 @@
     background: var(--primary-color);
     color: #fff;
 }
-.auth-container .submit-btn.danger{
-  background-color: var(--error-bg);
-  color: var(--error-text);
-}
-.auth-container .submit-btn.neutral{
-    background-color: var(--input-bg);
-    color: var(--text-color);
-    text-align: center;
-}
+
 .auth-container p.subtitle {
     text-align: center;
     font-size: 1.35rem;

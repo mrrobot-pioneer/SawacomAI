@@ -103,26 +103,51 @@ a:hover{
 
 
 /* global classes */
-.primary-btn {
-    background-color: var(--secondary-color);
-    color: var(--primary-color);
+.btn{
     padding: 1rem 2rem;
     border-radius: 3rem;
     font-weight: 500;
     font-size: 1.5rem;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     gap: 1rem;
-    text-decoration: none;
+    cursor: pointer;
+    text-decoration: none !important;
     transition: all 0.1s ease-in-out;
+}
+.btn:hover{
+    text-decoration: none !important;
+}
+
+.btn-neutral{
+    border: 1px solid var(--input-bg);
+    background-color: transparent;
+    color: var(--text-color);
+}
+.btn-neutral:hover{
+    background-color: var(--input-bg);
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+.primary-btn {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
 }
 .primary-btn:hover {
     background-color: var(--btn-hover);
-    cursor: pointer;
-    text-decoration: none;
     color: var(--primary-color);
 }
+
+.btn-danger{
+    background-color: var(--error-text);
+    color: #fff;
+}
+.btn-danger:hover{
+    opacity: .8;
+}
+
 
 .small-text{
     font-size: 1rem;
@@ -280,6 +305,47 @@ a:hover{
     background-color: #f0f0f0;
 }
 }
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100001;
+  }
+  
+/* Modal Dialog */
+.modal-dialog {
+    background: #fff;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: var(--shadow);
+}
+
+.modal-header h3{
+    font-size: 2rem;
+    font-weight: 500;
+}
+
+.modal-footer{
+    display: flex;
+    justify-content: end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+  
 
 
 /* Header */
@@ -527,6 +593,7 @@ a:hover{
     position: relative;
     padding: .9rem 1rem;
     border-radius: 3rem;
+    gap: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -548,7 +615,6 @@ a:hover{
     font-weight: 400;
     font-size: 1.35rem;
     display: block;
-    text-decoration: none;
     white-space: nowrap;   
     text-overflow: ellipsis;        
     overflow: hidden;              
@@ -651,6 +717,16 @@ a:hover{
     border-radius: 3rem;
 }
 
+/* Input for renaming (inline) */
+.sidebar .rename-input {
+    width: 100%;
+    background-color: transparent;
+    /* padding: 0.25rem 0.5rem; */
+    font-size: 1.35rem;
+}  
+
+
+/* sidebar page links */
 .sidebar-bottom{
     padding: 0 1.5rem 2rem 2rem;
 }

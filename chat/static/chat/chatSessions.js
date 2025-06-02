@@ -72,7 +72,7 @@
     const div = document.createElement('div');
     div.classList.add('no-chats-message');
     div.innerHTML = `
-      <i class="fa-solid fa-comment-slash"></i>
+      <i class="fa-solid fa-comment-slash" style="font-size: 1.5rem"></i>
       <p>No saved chats yet</p>
     `;
     chatsList.appendChild(div);
@@ -126,17 +126,29 @@
         </div>
       `;
 
-      // When <li> is clicked, load messages AND close the sidebar
+      // 1) Clicking anywhere on the LI (except the menu‐icon) loads messages
       li.addEventListener('click', () => {
         selectSession(sess.id);
-        if (typeof closeSidebar === 'function') {
-          closeSidebar();
-        }
+        if (typeof closeSidebar === 'function') closeSidebar();
       });
 
-      // Prevent li click when clicking the menu icon, and toggle options
+      // 2) Toggle chat‐options menu when the “ellipsis” icon is clicked
       const menuIcon = li.querySelector('.chat-menu');
       menuIcon.addEventListener('click', e => toggleChatOptions(e, menuIcon));
+
+      // 3) “Rename” option
+      const renameOption = li.querySelector('.option.rename');
+      renameOption.addEventListener('click', e => {
+        e.stopPropagation();
+        startRename(li, sess.id, titleText);
+      });
+
+      // 4) “Delete” option
+      const deleteOption = li.querySelector('.option.delete');
+      deleteOption.addEventListener('click', e => {
+        e.stopPropagation();
+        showDeleteModal(sess.id);
+      });
 
       chatsList.appendChild(li);
     });
@@ -211,4 +223,176 @@
   }
 
 
+  // ———————— DELETE Modal Logic ————————
+  let toDeleteSessionId = null;
+  const deleteModal = document.getElementById('deleteModal');
+  const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+  function showDeleteModal(sessionId) {
+    toDeleteSessionId = sessionId;
+    deleteModal.style.display = 'flex';
+  }
+
+  function hideDeleteModal() {
+    toDeleteSessionId = null;
+    deleteModal.style.display = 'none';
+    if (typeof closeSidebar === 'function') closeSidebar();
+  }
+
+  deleteModal.addEventListener('click', () => {
+    hideDeleteModal();
+  });
+
+  cancelDeleteBtn.addEventListener('click', () => {
+    hideDeleteModal();
+  });
+
+  confirmDeleteBtn.addEventListener('click', () => {
+    if (!toDeleteSessionId) return;
+
+    const deletingId = toDeleteSessionId;
+    toDeleteSessionId = null;
+
+    hideDeleteModal();
+
+    axios.delete(`/chat-sessions/${deletingId}/delete/`)
+      .then(() => {
+        if (deletingId === currentSessionId) {
+          window.location.href = '/';
+        } else {
+          const li = chatsList.querySelector(`li[data-session-id="${deletingId}"]`);
+          if (li) li.remove();
+        }
+      })
+      .catch(err => {
+        const isNetworkError = !err.response;
+        const msgText = isNetworkError
+          ? 'Network error. Please check your connection and try again.'
+          : 'Could not delete session. Please try again.';
+        showGlobalMessage(msgText);
+      });
+  });
+  
+  // ———————— RENAME Inline Logic ————————
+
+  /**
+   * Turn the <span class="session-title"> into an <input> so the user can edit.
+   * When “Enter” is pressed or the input loses focus, send a PATCH if changed.
+   */
+  function startRename(liElement, sessionId, oldTitle) {
+    // 1) Hide any other open rename/edit fields first
+    document.querySelectorAll('.rename-input').forEach(inp => {
+      inp.parentElement.querySelector('.session-title').style.display = 'inline';
+      inp.remove();
+    });
+
+    // 2) Get the <span class="session-title">
+    const titleSpan = liElement.querySelector('.session-title');
+    titleSpan.style.display = 'none';
+
+    // 3) Create an <input class="rename-input"> in its place
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = oldTitle;
+    input.classList.add('rename-input');
+    // Insert right before the span so it occupies same spot
+    titleSpan.parentNode.insertBefore(input, titleSpan);
+
+    input.focus();
+    input.select();
+
+    input.addEventListener("click", (e)=>{
+      e.stopPropagation();
+    })
+
+    // If user hits Enter, commit; if user hits Escape, cancel
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        commitRename(liElement, sessionId, input, oldTitle);
+      } else if (e.key === 'Escape') {
+        cancelRename(input, titleSpan);
+      }
+    });
+
+    // If user clicks away, commit too
+    input.addEventListener('blur', () => {
+      commitRename(liElement, sessionId, input, oldTitle);
+    });
+  }
+
+  function cancelRename(inputEl, spanEl) {
+    inputEl.remove();
+    spanEl.style.display = 'inline';
+    
+    if (typeof closeSidebar === 'function') closeSidebar();
+  }
+
+  function commitRename(liElement, sessionId, inputEl, oldTitle) {
+    const newTitle = inputEl.value.trim();
+    const spanEl = liElement.querySelector('.session-title');
+  
+    if (!newTitle || newTitle === oldTitle) {
+      cancelRename(inputEl, spanEl);
+      return;
+    }
+  
+    // 1) Optimistically update the UI
+    spanEl.innerText = newTitle;
+    cancelRename(inputEl, spanEl);
+  
+    // 2) Send PATCH to backend
+    axios.patch(`/chat-sessions/${sessionId}/rename/`, { title: newTitle })
+      .then(() => {
+       //do nothing, as we already updated the new title
+      })
+      .catch(err => {
+        // 1) Revert UI back to old title
+        spanEl.innerText = oldTitle;
+  
+        const isNetworkError = !err.response;
+        const msgText = isNetworkError
+          ? 'Network error. Please check your connection and try again.'
+          : 'Could not rename chat session. Please try again.';
+        showGlobalMessage(msgText);
+  
+        // Wire up the close-button
+        const closeBtn = li.querySelector('.close-btn');
+        closeBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          li.remove();
+        });
+      });
+  }
+
+  /**
+   * Show a global message at the top of <main> with a close‐button.
+   */
+  function showGlobalMessage(text) {
+    let messagesUl = document.querySelector('ul.global-messages');
+    if (!messagesUl) {
+      const mainTag = document.querySelector('main');
+      if (!mainTag) return;
+      messagesUl = document.createElement('ul');
+      messagesUl.classList.add('global-messages');
+      mainTag.prepend(messagesUl);
+    }
+
+    const li = document.createElement('li');
+    li.setAttribute('role', 'alert');
+    li.classList.add('global-message', 'error');
+    li.innerHTML = `
+      <span>${text}</span>
+      <span class="close-btn">&times;</span>
+    `;
+
+    messagesUl.prepend(li);
+    const closeBtn = li.querySelector('.close-btn');
+    closeBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      li.remove();
+    });
+  }
+  
 })();
