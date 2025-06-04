@@ -1,7 +1,10 @@
 (() => {
   // Sidebar container
   const chatsList = document.getElementById('chatsList');
-  let currentSessionId = null;
+  // Instead of a local variable, use window.currentSessionId for shared state:
+  if (typeof window.currentSessionId === 'undefined') {
+    window.currentSessionId = null;
+  }
 
   /**
    * When clicking the ellipsis icon, hide all other options then toggle this one.
@@ -48,6 +51,9 @@
         }
       });
   }
+
+  // Expose for other scripts
+  window.loadSidebarSessions = loadSidebarSessions;
   
 
   /**
@@ -153,8 +159,10 @@
       chatsList.appendChild(li);
     });
 
-    if (currentSessionId) highlightActiveSession(currentSessionId);
-  }
+    if (window.currentSessionId) {
+        highlightActiveSession(window.currentSessionId);
+    }  
+    }
 
   /**
    * Select a session: mark active and load messages.
@@ -169,9 +177,9 @@
     }
 
     // Already on “/”:
-    // 1) If we have a different sessionId in memory, or none, just load this one:
-    if (sessionId !== currentSessionId) {
-      currentSessionId = sessionId;
+    // 1) If we have a different sessionId in memory (or none), load it:
+    if (sessionId !== window.currentSessionId) {
+      window.currentSessionId = sessionId;
       highlightActiveSession(sessionId);
       if (typeof window.loadSessionMessages === 'function') {
         window.loadSessionMessages(sessionId);
@@ -189,13 +197,13 @@
     });
   }
 
+  //expose to other scripts
+  window.highlightActiveSession = highlightActiveSession;
+
   // Clicking outside chat-menu hides all options
   document.addEventListener('click', () => {
     document.querySelectorAll(".chat-options").forEach(opt => opt.style.display = "none");
   });
-
-  // Expose for other scripts
-  window.loadSidebarSessions = loadSidebarSessions;
 
   document.addEventListener('DOMContentLoaded', () => {
     // On load, see if ?session_id=<…> is present

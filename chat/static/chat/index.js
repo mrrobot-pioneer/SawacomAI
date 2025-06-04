@@ -219,14 +219,26 @@
     .then(response => {
       const data = response.data;
 
-      // Save new session_id if this was the first message
-      if (data.session_id && !currentSessionId) {
-        currentSessionId = data.session_id;
-        // Tell sidebar.js to refresh its list:
-        if (typeof window.loadSidebarSessions === 'function') {
-          window.loadSidebarSessions();
+        // If this is the *very first* message of a brand‐new chat,
+        // store that new UUID, update URL, refresh sidebar, and highlight it:
+        if (data.session_id && !currentSessionId) {
+          currentSessionId = data.session_id;
+
+          // 1) Refresh the sidebar so the new session appears
+          if (typeof window.loadSidebarSessions === 'function') {
+            window.loadSidebarSessions();
+          }
+
+          // 2) Highlight that new session in the sidebar
+          if (typeof window.highlightActiveSession === 'function') {
+            window.highlightActiveSession(currentSessionId);
+          }
+
+          // 3) Add ?session_id=<new‐uuid> to the URL (so a reload will re-open it)
+          const params = new URLSearchParams(window.location.search);
+          params.set('session_id', currentSessionId);
+          window.history.replaceState(null, '', `/?${params.toString()}`);
         }
-      }
 
       const textEl = thinkingBubble.querySelector('.message-text');
       textEl.innerText = data.reply || "I didn't get that.";
