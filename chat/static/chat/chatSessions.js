@@ -1,406 +1,278 @@
-(() => {
-  // Sidebar container
-  const chatsList = document.getElementById('chatsList');
-  // Instead of a local variable, use window.currentSessionId for shared state:
-  if (typeof window.currentSessionId === 'undefined') {
-    window.currentSessionId = null;
-  }
+/**
+ * chatSessions.js
+ * ---------------------------------------------------------------------------
+ * Sidebar UI for listing, creating, renaming and deleting chat sessions.
+ * - Pure UI concerns (DOM only)
+ * - **No** direct data‑fetching logic outside the session manager
+ * - Knows nothing about the main chat window – communicates through
+ *   `sessionManager.js`, our single source of truth.
+ * ---------------------------------------------------------------------------
+ */
 
-  /**
-   * When clicking the ellipsis icon, hide all other options then toggle this one.
-   */
-  function toggleChatOptions(e, menuIcon) {
-    e.stopPropagation();
-    document.querySelectorAll(".chat-options").forEach(opt => opt.style.display = "none");
-    const options = menuIcon.nextElementSibling;
-    options.style.display = (options.style.display === "block") ? "none" : "block";
-  }
+import {
+  getSessionId,
+  setSessionId,
+  onSessionChange
+} from './sessionManager.js';
 
-  /**
-   * Fetch sessions and render them.
-   * - If HTTP 403: show “Log in to access your saved chats”
-   * - If 200 + empty array: show “No saved chats yet”
-   * - Otherwise on error: show “Error loading chats”
-   */
-  function showSidebarLoading() {
-    chatsList.innerHTML = '';
-    for (let i = 0; i < 5; i++) {
-      const li = document.createElement('li');
-      li.classList.add('skeleton-item');
-      chatsList.appendChild(li);
-    }
-  }
+import {
+  fetchSessions,
+  deleteSession,
+  renameSession
+} from './apiCalls.js';
 
-  function loadSidebarSessions() {
-    if (!chatsList) return;
+// ---------------------------------------------------------------------------
+// DOM CACHING & START‑UP
+// ---------------------------------------------------------------------------
 
-    showSidebarLoading();
+const chatsList   = document.getElementById('chatsList');
+const newChatBtn  = document.querySelector('.newchat-btn');
 
-    axios.get('/chat-sessions/')
-      .then(response => {
-        // response.data is an array of sessions
-        renderSidebarSessions(response.data);
-      })
-      .catch(err => {
-        if (err.response && err.response.status === 403) {
-          renderLoginMessage();
-        } else  if(!err.response) {
-          renderErrorMessage("Network error. Please check your connection.");
-        }else {
-          renderErrorMessage("Error loading chats. Please try again.");
-        }
-      });
-  }
+if (chatsList)   loadSidebarSessions();   // fetch as soon as sidebar exists
+if (newChatBtn)  newChatBtn.addEventListener('click', handleNewChat);
 
-  // Expose for other scripts
-  window.loadSidebarSessions = loadSidebarSessions;
-  
+// keep the active <li> in sync with current session
+onSessionChange(id => highlightActiveSession(id));
 
-  /**
-   * Show “Log in to access your saved chats” when user is not authenticated.
-   */
-  function renderLoginMessage() {
-    chatsList.innerHTML = '';
-    const div = document.createElement('div');
-    div.classList.add('no-chats-message');
-    div.innerHTML = `
-      <i class="fa-solid fa-comment-slash"></i>
-      <p>Log in to access your saved chats</p>
-    `;
-    chatsList.appendChild(div);
-  }
+// ---------------------------------------------------------------------------
+// PUBLIC API (imports from other modules may call these)
+// ---------------------------------------------------------------------------
 
-  /**
-   * Show “No saved chats yet” when user has no sessions.
-   */
-  function renderNoSavedChats() {
-    chatsList.innerHTML = '';
-    const div = document.createElement('div');
-    div.classList.add('no-chats-message');
-    div.innerHTML = `
-      <i class="fa-solid fa-comment-slash" style="font-size: 1.5rem"></i>
-      <p>No saved chats yet</p>
-    `;
-    chatsList.appendChild(div);
-  }
+export function loadSidebarSessions() {
+  if (!chatsList) return;
+  // renderLoadingSkeleton();
 
-  /**
-   * Show a generic error message (provided by caller).
-   */
-  function renderErrorMessage(msg) {
-    chatsList.innerHTML = '';
-    const div = document.createElement('div');
-    div.classList.add('error-chats-message');
-    div.innerHTML = `
-      <p>${msg}</p>
-      <button class="retry-btn" onclick="loadSidebarSessions()">
-        <i class="fa-solid fa-rotate"></i>
-        Retry
-      </button>
-    `;
-    chatsList.appendChild(div);
-  }
-
-  /**
-   * Render <li> elements for each session. Clicking <li> loads its messages.
-   */
-  function renderSidebarSessions(sessions) {
-    chatsList.innerHTML = '';
-    if (sessions.length === 0) {
-      renderNoSavedChats();
-      return;
-    }
-
-    sessions.forEach(sess => {
-      const li = document.createElement('li');
-      li.classList.add('chat-session');
-      li.dataset.sessionId = sess.id;
-
-      // Use the title returned by the backend
-      const titleText = sess.title || "Untitled Chat";
-
-      li.innerHTML = `
-        <span class="session-title">${titleText}</span>
-        <i class="fa-solid fa-ellipsis chat-menu"></i>
-        <div class="chat-options" style="display: none;">
-          <div class="option rename">
-            <i class="fa-regular fa-pen-to-square"></i> Rename
-          </div>
-          <div class="option delete">
-            <i class="fa-solid fa-trash"></i> Delete
-          </div>
-        </div>
-      `;
-
-      // 1) Clicking anywhere on the LI (except the menu‐icon) loads messages
-      li.addEventListener('click', () => {
-        selectSession(sess.id);
-        if (typeof closeSidebar === 'function') closeSidebar();
-      });
-
-      // 2) Toggle chat‐options menu when the “ellipsis” icon is clicked
-      const menuIcon = li.querySelector('.chat-menu');
-      menuIcon.addEventListener('click', e => toggleChatOptions(e, menuIcon));
-
-      // 3) “Rename” option
-      const renameOption = li.querySelector('.option.rename');
-      renameOption.addEventListener('click', e => {
-        e.stopPropagation();
-        startRename(li, sess.id, titleText);
-      });
-
-      // 4) “Delete” option
-      const deleteOption = li.querySelector('.option.delete');
-      deleteOption.addEventListener('click', e => {
-        e.stopPropagation();
-        showDeleteModal(sess.id);
-      });
-
-      chatsList.appendChild(li);
-    });
-
-    if (window.currentSessionId) {
-        highlightActiveSession(window.currentSessionId);
-    }  
-    }
-
-  /**
-   * Select a session: mark active and load messages.
-   */
-  function selectSession(sessionId) {
-    const path = window.location.pathname;
-
-    if (path !== '/') {
-      // Not on “/” → redirect with ?session_id=<id>
-      window.location.href = '/?session_id=' + sessionId;
-      return;
-    }
-
-    // Already on “/”:
-    // 1) If we have a different sessionId in memory (or none), load it:
-    if (sessionId !== window.currentSessionId) {
-      window.currentSessionId = sessionId;
-      highlightActiveSession(sessionId);
-      if (typeof window.loadSessionMessages === 'function') {
-        window.loadSessionMessages(sessionId);
+  fetchSessions()
+    .then(renderSidebarSessions)
+    .catch(err => {
+      if(!err.response){
+        renderErrorMessage("Network error. Please check your connection.")
+      }else if(err.response.status === 403){
+        renderLoginMessage()
+      }else{
+        renderErrorMessage("Error loading chats. Please try again.'")
       }
-    }
-    // If sessionId === currentSessionId, do nothing (already loaded)
-  }
-
-  /**
-   * Add 'active' class to the chosen <li>.
-   */
-  function highlightActiveSession(sessionId) {
-    chatsList.querySelectorAll('li').forEach(li => {
-      li.classList.toggle('active', li.dataset.sessionId === sessionId);
     });
-  }
+}
 
-  //expose to other scripts
-  window.highlightActiveSession = highlightActiveSession;
-
-  // Clicking outside chat-menu hides all options
-  document.addEventListener('click', () => {
-    document.querySelectorAll(".chat-options").forEach(opt => opt.style.display = "none");
+export function highlightActiveSession(id) {
+  chatsList?.querySelectorAll('li').forEach(li => {
+    li.classList.toggle('active', li.dataset.sessionId === id);
   });
+}
 
-  document.addEventListener('DOMContentLoaded', () => {
-    // On load, see if ?session_id=<…> is present
-    const urlParams = new URLSearchParams(window.location.search);
-    const paramId = urlParams.get('session_id');
-    if (paramId) {
-      currentSessionId = paramId;
-    }
-    if (chatsList) loadSidebarSessions();
-  });
+// ---------------------------------------------------------------------------
+// RENDER HELPERS
+// ---------------------------------------------------------------------------
+ 
+function renderLoginMessage() {
+  chatsList.innerHTML = '';
+  const div = document.createElement('div');
+  div.classList.add('no-chats-message');
+  div.innerHTML = `
+    <i class="fa-solid fa-comment-slash" style="font-size:1.5rem"></i>
+    <p>Log in for chat history</p>
+  `;
+  chatsList.appendChild(div);
+}
 
-  // When “New chat” is clicked:
-  const newChatBtn = document.querySelector('.newchat-btn');
-  if (newChatBtn) {
-    newChatBtn.addEventListener('click', () => {
-      const path = window.location.pathname;
+function renderNoSavedChats() {
+  chatsList.innerHTML = '';
+  const div = document.createElement('div');
+  div.className = 'no-chats-message';
+  div.innerHTML = `
+    <i class="fa-solid fa-comment-slash" style="font-size:1.5rem"></i>
+    <p>No saved chats yet</p>`;
+  chatsList.appendChild(div);
+}
 
-    if (path !== '/') { // Not on “/”, so go there and start fresh
-      window.location.href = '/';
-    } else if (currentSessionId) { // Already on “/” but have an active session → reload to clear it
-      window.location.href = '/';
-    } 
-    // else: on “/” and no currentSessionId → already a new chat, do nothing
-  });
-  }
+function renderErrorMessage(text) {
+  chatsList.innerHTML = '';
+  const div = document.createElement('div');
+  div.className = 'error-chats-message';
+  div.innerHTML = `
+    <p>${text}</p>
+    <button class="retry-btn"><i class="fa-solid fa-rotate"></i> Retry</button>`;
+  div.querySelector('button').addEventListener('click', loadSidebarSessions);
+  chatsList.appendChild(div);
+}
 
+function renderSidebarSessions(sessions) {
+  chatsList.innerHTML = '';
+  if (!sessions.length) return renderNoSavedChats();
 
-  // ———————— DELETE Modal Logic ————————
-  let toDeleteSessionId = null;
-  const deleteModal = document.getElementById('deleteModal');
-  const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+  sessions.forEach(sess => chatsList.appendChild(buildSessionLi(sess)));
+  highlightActiveSession(getSessionId());
+}
 
-  function showDeleteModal(sessionId) {
-    toDeleteSessionId = sessionId;
-    deleteModal.style.display = 'flex';
-  }
+function buildSessionLi(sess) {
+  const li = document.createElement('li');
+  li.className       = 'chat-session';
+  li.dataset.sessionId = sess.id;
 
-  function hideDeleteModal() {
-    toDeleteSessionId = null;
-    deleteModal.style.display = 'none';
+  const title        = sess.title || 'Untitled Chat';
+
+  li.innerHTML = `
+    <span class="session-title">${title}</span>
+    <i class="fa-solid fa-ellipsis chat-menu"></i>
+    <div class="chat-options" style="display:none;">
+      <div class="option rename"><i class="fa-regular fa-pen-to-square"></i> Rename</div>
+      <div class="option delete"><i class="fa-solid fa-trash"></i> Delete</div>
+    </div>`;
+
+  // ----- interactions ------------------------------------------------------
+  li.addEventListener('click', () => {
+    selectSession(sess.id);
     if (typeof closeSidebar === 'function') closeSidebar();
+  });
+
+  const menuIcon   = li.querySelector('.chat-menu');
+  const renameOpt  = li.querySelector('.option.rename');
+  const deleteOpt  = li.querySelector('.option.delete');
+
+  menuIcon .addEventListener('click', e => toggleChatOptions(e, menuIcon));
+  renameOpt.addEventListener('click', e => { e.stopPropagation(); startRename(li, sess.id, title); });
+  deleteOpt.addEventListener('click', e => { e.stopPropagation(); showDeleteModal(sess.id); });
+
+  return li;
+}
+
+// ---------------------------------------------------------------------------
+// SESSION SELECTION & URL SYNC
+// ---------------------------------------------------------------------------
+
+function selectSession(id) {
+  // Non‑chat pages – just redirect to home with the id
+  if (location.pathname !== '/') {
+    location.href = '/?session_id=' + id;
+    return;
   }
+  // Chat page – update central store (triggers chat‑window reload)
+  setSessionId(id);
+}
 
-  deleteModal.addEventListener('click', () => {
-    hideDeleteModal();
-  });
+function handleNewChat() {
+  const path = window.location.pathname;
 
-  cancelDeleteBtn.addEventListener('click', () => {
-    hideDeleteModal();
-  });
+  if(path !== '/' || getSessionId()){
+    location.href = '/';
+  }
+}
 
-  confirmDeleteBtn.addEventListener('click', () => {
-    if (!toDeleteSessionId) return;
+// ---------------------------------------------------------------------------
+// TOGGLE chat‑options ellipsis menu
+// ---------------------------------------------------------------------------
 
-    const deletingId = toDeleteSessionId;
-    toDeleteSessionId = null;
+function toggleChatOptions(e, menuIcon) {
+  e.stopPropagation();
+  document.querySelectorAll('.chat-options').forEach(opt => opt.style.display = 'none');
+  const box = menuIcon.nextElementSibling;
+  box.style.display = box.style.display === 'block' ? 'none' : 'block';
+}
 
-    hideDeleteModal();
+// hide menus when clicking anywhere else
+document.addEventListener('click', () => {
+  document.querySelectorAll('.chat-options').forEach(el => el.style.display = 'none');
+});
 
-    axios.delete(`/chat-sessions/${deletingId}/delete/`)
-      .then(() => {
-        if (deletingId === currentSessionId) {
-          window.location.href = '/';
-        } else {
-          const li = chatsList.querySelector(`li[data-session-id="${deletingId}"]`);
-          if (li) li.remove();
-        }
-      })
-      .catch(err => {
-        const isNetworkError = !err.response;
-        const msgText = isNetworkError
-          ? 'Network error. Please check your connection and try again.'
-          : 'Could not delete session. Please try again.';
-        showGlobalMessage(msgText);
-      });
-  });
-  
-  // ———————— RENAME Inline Logic ————————
+// ---------------------------------------------------------------------------
+// DELETE  /  RENAME  (modal + inline edit)
+// ---------------------------------------------------------------------------
+//  *UI only* – the server APIs are hit directly here; no need to touch store.
 
-  /**
-   * Turn the <span class="session-title"> into an <input> so the user can edit.
-   * When “Enter” is pressed or the input loses focus, send a PATCH if changed.
-   */
-  function startRename(liElement, sessionId, oldTitle) {
-    // 1) Hide any other open rename/edit fields first
-    document.querySelectorAll('.rename-input').forEach(inp => {
-      inp.parentElement.querySelector('.session-title').style.display = 'inline';
-      inp.remove();
-    });
+let toDeleteSessionId = null;
+const deleteModal      = document.getElementById('deleteModal');
+const cancelDeleteBtn  = document.getElementById('cancelDeleteBtn');
+const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
-    // 2) Get the <span class="session-title">
-    const titleSpan = liElement.querySelector('.session-title');
-    titleSpan.style.display = 'none';
+if (deleteModal) {
+  deleteModal.addEventListener('click', hideDeleteModal);
+  cancelDeleteBtn?.addEventListener('click', hideDeleteModal);
+  confirmDeleteBtn?.addEventListener('click', handleConfirmDelete);
+}
 
-    // 3) Create an <input class="rename-input"> in its place
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = oldTitle;
-    input.classList.add('rename-input');
-    // Insert right before the span so it occupies same spot
-    titleSpan.parentNode.insertBefore(input, titleSpan);
+function showDeleteModal(id) {
+  toDeleteSessionId      = id;
+  deleteModal.style.display = 'flex';
+}
+function hideDeleteModal() {
+  toDeleteSessionId      = null;
+  deleteModal.style.display = 'none';
+  if (typeof closeSidebar === 'function') closeSidebar();
+}
+function handleConfirmDelete() {
+  if (!toDeleteSessionId) return;
+  const id = toDeleteSessionId;
+  hideDeleteModal();
 
-    input.focus();
-    input.select();
-
-    input.addEventListener("click", (e)=>{
-      e.stopPropagation();
+  deleteSession(id)
+    .then(() => {
+      if (id === getSessionId()) location.href = '/';
+      else chatsList.querySelector(`li[data-session-id="${id}"]`)?.remove();
     })
+    .catch(err => showGlobalMessage(
+      !err.response ? 'Network error. Please try again.' : 'Could not delete session.'
+    ));
+}
 
-    // If user hits Enter, commit; if user hits Escape, cancel
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        commitRename(liElement, sessionId, input, oldTitle);
-      } else if (e.key === 'Escape') {
-        cancelRename(input, titleSpan);
-      }
-    });
+// -----------------------------  RENAME ------------------------------------
+function startRename(li, id, oldTitle) {
+  // collapse any other inline edits first
+  document.querySelectorAll('.rename-input').forEach(inp => {
+    inp.parentElement.querySelector('.session-title').style.display = 'inline';
+    inp.remove();
+  });
 
-    // If user clicks away, commit too
-    input.addEventListener('blur', () => {
-      commitRename(liElement, sessionId, input, oldTitle);
-    });
-  }
+  const span  = li.querySelector('.session-title');
+  span.style.display = 'none';
 
-  function cancelRename(inputEl, spanEl) {
-    inputEl.remove();
-    spanEl.style.display = 'inline';
-    
+  const input = document.createElement('input');
+  input.className = 'rename-input';
+  input.value = oldTitle;
+  span.parentNode.insertBefore(input, span);
+  input.focus(); input.select();
+
+  input.addEventListener('click', e => e.stopPropagation());
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter')  commitRename();
+    if (e.key === 'Escape') cancelRename();
+  });
+  input.addEventListener('blur', commitRename);
+
+  function cancelRename() {
+    input.remove(); span.style.display = 'inline';
     if (typeof closeSidebar === 'function') closeSidebar();
   }
+  function commitRename() {
+    const newTitle = input.value.trim();
+    if (!newTitle || newTitle === oldTitle) return cancelRename();
 
-  function commitRename(liElement, sessionId, inputEl, oldTitle) {
-    const newTitle = inputEl.value.trim();
-    const spanEl = liElement.querySelector('.session-title');
-  
-    if (!newTitle || newTitle === oldTitle) {
-      cancelRename(inputEl, spanEl);
-      return;
-    }
-  
-    // 1) Optimistically update the UI
-    spanEl.innerText = newTitle;
-    cancelRename(inputEl, spanEl);
-  
-    // 2) Send PATCH to backend
-    axios.patch(`/chat-sessions/${sessionId}/rename/`, { title: newTitle })
-      .then(() => {
-       //do nothing, as we already updated the new title
-      })
-      .catch(err => {
-        // 1) Revert UI back to old title
-        spanEl.innerText = oldTitle;
-  
-        const isNetworkError = !err.response;
-        const msgText = isNetworkError
-          ? 'Network error. Please check your connection and try again.'
-          : 'Could not rename chat session. Please try again.';
-        showGlobalMessage(msgText);
-  
-        // Wire up the close-button
-        const closeBtn = li.querySelector('.close-btn');
-        closeBtn.addEventListener('click', e => {
-          e.stopPropagation();
-          li.remove();
-        });
+    span.textContent = newTitle;
+    cancelRename();   // optimistic UI update
+
+    renameSession(id, newTitle)
+      .catch(() => {
+        span.textContent = oldTitle;   // revert UI
+        showGlobalMessage('Could not rename chat session.');
       });
   }
+}
 
-  /**
-   * Show a global message at the top of <main> with a close‐button.
-   */
-  function showGlobalMessage(text) {
-    let messagesUl = document.querySelector('ul.global-messages');
-    if (!messagesUl) {
-      const mainTag = document.querySelector('main');
-      if (!mainTag) return;
-      messagesUl = document.createElement('ul');
-      messagesUl.classList.add('global-messages');
-      mainTag.prepend(messagesUl);
-    }
+// ---------------------------------------------------------------------------
+// MISC  – global message banner helper
+// ---------------------------------------------------------------------------
 
-    const li = document.createElement('li');
-    li.setAttribute('role', 'alert');
-    li.classList.add('global-message', 'error');
-    li.innerHTML = `
-      <span>${text}</span>
-      <span class="close-btn">&times;</span>
-    `;
-
-    messagesUl.prepend(li);
-    const closeBtn = li.querySelector('.close-btn');
-    closeBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      li.remove();
-    });
+function showGlobalMessage(text) {
+  let ul = document.querySelector('ul.global-messages');
+  if (!ul) {
+    ul = document.createElement('ul');
+    ul.className = 'global-messages';
+    document.querySelector('main')?.prepend(ul);
   }
-  
-})();
+  const li = document.createElement('li');
+  li.className = 'global-message error';
+  li.setAttribute('role', 'alert');
+  li.innerHTML = `<span>${text}</span><span class="close-btn">&times;</span>`;
+  li.querySelector('.close-btn').addEventListener('click', () => li.remove());
+  ul.prepend(li);
+}

@@ -67,7 +67,5 @@
 
 
 {% block scripts %}
-
-    <script src="{% static 'chat/helpers.js' %}" defer></script>
-    <script src="{% static 'chat/index.js' %}" defer></script>
+    <script type="module" src="{% static 'chat/index.js' %}" defer></script>
 {% endblock %}

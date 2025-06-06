@@ -56,7 +56,7 @@
     <!-- Global base script -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
     <script src="{% static 'js/base.js' %}" defer></script>
-    <script src="{% static 'chat/chatSessions.js' %}" defer></script>
+    <script type="module" src="{% static 'chat/chatSessions.js' %}" defer></script> <!-- chat sessions in the sidebar are global-->
 
     <!-- Page-specific scripts injected here-->
     {% block scripts %} {% endblock %}
