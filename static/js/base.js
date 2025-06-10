@@ -1,78 +1,110 @@
-/*** Header and Sidebar functionalty ****/
+/**
+ * baseUI.js
+ * ────────────────────────────────────────────────────────────────────────────
+ * Site-wide header + sidebar behaviour **and** a tiny Axios-CSRF helper.
+ *
+ *
+ * 1. Header
+ *    • Account-icon dropdown
+ *    • Dismissible global flash messages
+ * 2. Sidebar
+ *    • Collapse / expand (desktop)
+ *    • Slide-in open / close (mobile + overlay)
+ *    • `closeSidebar()` is exported *and* attached to `window` for legacy code
+ * 3. getCookie()  ➜  Automatically wires CSRF header for Axios
+ * ────────────────────────────────────────────────────────────────────────────
+ */
 
-// Grab the account icon (if it exists for logged-in users)
+/* ------------------------------------------------------------------ */ 
+/* 1 ▸ HEADER CONTROLS                                                */
+/* ------------------------------------------------------------------ */
 const accountIcon = document.getElementById('accountIcon');
+const globalMessageCloseBtns = document.querySelectorAll('.global-messages .close-btn');
 
+// ── account-icon dropdown ───────────────────────────────────────────
 if (accountIcon) {
-  // account dropdown toggle
   accountIcon.addEventListener('click', e => {
     e.stopPropagation();
     accountIcon.classList.toggle('open');
   });
 
-  // close account dropdown when clicking outside
-  document.addEventListener('click', () => {
-    accountIcon.classList.remove('open');
-  });
+  // click anywhere else → collapse dropdown
+  document.addEventListener('click', () => accountIcon.classList.remove('open'));
 }
 
-// close messsage
-document
-  .querySelectorAll('.global-messages .close-btn')
-  .forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      btn.closest('.global-message').remove();
-    });
-});
+// ── dismiss flash messages ─────────────────────────────────────────
+globalMessageCloseBtns.forEach(btn =>
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    btn.closest('.global-message')?.remove();
+  })
+);
 
+/* ------------------------------------------------------------------ */
+/* 2 ▸ SIDEBAR CONTROLS                                               */
+/* ------------------------------------------------------------------ */
+const sidebarEl   = document.querySelector('.sidebar');
+const overlayEl   = document.querySelector('.sidebar-overlay');
 
-// Sidebar toggle functionality for both mobile and desktop 
+const btn = {
+  collapse: document.getElementById('sidebarCollapse'), // desktop
+  expand  : document.getElementById('sidebarToggle'),   // desktop mini-icon
+  close   : document.getElementById('sidebarClose')     // mobile “×”
+};
 
-const sidebar = document.querySelector('.sidebar');
-const sidebarCollapse = document.getElementById('sidebarCollapse');
-const sidebarToggle = document.getElementById('sidebarToggle');
-const sidebarClose = document.getElementById('sidebarClose');
-const overlay = document.querySelector(".sidebar-overlay");
-
-// --- Sidebar Toggle Logic ---
-
+// —— collapse / expand (desktop) ————————————————
 function collapseSidebar() {
-    sidebar.classList.add('collapsed');
-    sidebarToggle.style.display = 'flex';
+  sidebarEl?.classList.add('collapsed');
+  if (btn.expand) btn.expand.style.display = 'flex';
 }
-
 function expandSidebar() {
-    sidebar.classList.remove('collapsed');
-    sidebarToggle.style.display = 'none';
+  sidebarEl?.classList.remove('collapsed');
+  if (btn.expand) btn.expand.style.display = 'none';
 }
 
-function openSidebar() {
-    sidebar.classList.add("open");
-    overlay.classList.add("show");
+// —— open / close (mobile overlay) ————————————————
+export function openSidebar() {
+  sidebarEl?.classList.add('open');
+  overlayEl?.classList.add('show');
+  document.dispatchEvent(new CustomEvent('sidebar:open'));
 }
 
-function closeSidebar() {
-    sidebar.classList.remove("open");
-    overlay.classList.remove("show");
+export function closeSidebar() {
+  sidebarEl?.classList.remove('open');
+  overlayEl?.classList.remove('show');
+  document.dispatchEvent(new CustomEvent('sidebar:close'));
 }
 
-// Desktop: Collapse/Expand sidebar
-if (sidebarCollapse) {
-    sidebarCollapse.addEventListener('click', collapseSidebar);
+// —— wire buttons ——————————————————————————————————
+btn.collapse?.addEventListener('click', collapseSidebar);
+btn.expand?.addEventListener('click', () => {
+  expandSidebar();   // desktop expand
+  openSidebar();     // and immediately open for mobile viewports
+});
+btn.close?.addEventListener('click', closeSidebar);
+overlayEl?.addEventListener('click', closeSidebar);
+
+/* ------------------------------------------------------------------ */
+/* 3 ▸ CSRF HELPER + AXIOS WIRING                                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Return the value of a cookie (or `null` if absent).
+ * @param {string} name
+ */
+export function getCookie(name) {
+  let value = null;
+  document.cookie
+    .split(';')
+    .forEach(cookie => {
+      const [key, val] = cookie.trim().split('=');
+      if (key === name) value = decodeURIComponent(val);
+    });
+  return value;
 }
 
-if (sidebarToggle) {
-    sidebarToggle.addEventListener('click', expandSidebar);
-    sidebarToggle.addEventListener('click', openSidebar); // for mobile as well
+// Attach CSRF token to all Axios requests (if Axios is present)
+if (typeof axios !== 'undefined') {
+  const csrf = getCookie('csrftoken');
+  if (csrf) axios.defaults.headers.common['X-CSRFToken'] = csrf;
 }
-
-// Mobile: Close sidebar
-if (sidebarClose) {
-    sidebarClose.addEventListener("click", closeSidebar);
-}
-
-if (overlay) {
-    overlay.addEventListener("click", closeSidebar);
-}
-

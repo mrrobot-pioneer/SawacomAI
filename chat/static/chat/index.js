@@ -101,7 +101,7 @@ async function loadSessionMessages(id) {
 
   activateChatLayout();
   syncUrl(id);
-  showMessagesLoading();
+  showSpinner();
 
   try {
     const msgs = await fetchMessages(id);
@@ -112,21 +112,12 @@ async function loadSessionMessages(id) {
   }
 }
 
-function showMessagesLoading() {
+function showSpinner() {
   chatBody.innerHTML = '';
-  for (let i = 0; i < 7; i++) {
-    const div = document.createElement('div');
-    div.classList.add('skeleton-message');
-    if (i % 2 === 0) {
-      div.classList.add('even');
-      div.innerHTML = '<div class="skeleton-text skeleton-item"></div>';
-    } else {
-      div.innerHTML = `
-        <div class="skeleton-avatar skeleton-item"></div>
-        <div class="skeleton-text skeleton-item"></div>`;
-    }
-    chatBody.appendChild(div);
-  }
+  const container = document.createElement('div');
+  container.className = 'spinner-container';
+  container.innerHTML = '<div class="spinner"></div>';
+  chatBody.appendChild(container);
 }
 
 function renderChatError(err) {

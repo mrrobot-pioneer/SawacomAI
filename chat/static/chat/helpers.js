@@ -3,25 +3,6 @@
  * Shared utilities for the Sawacom chat UI.
  * Keep these stateless (except where explicitly noted).
  */
-
-  //////////////////////////////
-  // ---- Cookie helpers ---- //
-  //////////////////////////////
-  export function getCookie(name) {
-    let cookieValue = null;
-    if (!document.cookie) return null;
-  
-    document.cookie.split(';').forEach(cookie => {
-      const [key, val] = cookie.trim().split('=');
-      if (key === name) cookieValue = decodeURIComponent(val);
-    });
-    return cookieValue;
-  }
-  
-  // -- Automatically attach CSRF on every axios request --
-  if (typeof axios !== 'undefined') {
-    axios.defaults.headers.common['X-CSRFToken'] = getCookie('csrftoken');
-  }
   
   ////////////////////////////////////////
   // ---- Chat-window DOM helpers ---- //
