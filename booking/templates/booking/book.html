@@ -52,7 +52,6 @@
 
 {% block scripts %}
 <script>
-  (async () => {
     const form      = document.getElementById('bookingForm');
     const msgBox    = document.getElementById('bookingMessage');
     const btn       = document.getElementById('submitBtn');
@@ -103,6 +102,5 @@
       btn.disabled = false;
     }
     });
-  })();
   </script>
   {% endblock %}

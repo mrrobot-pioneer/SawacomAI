@@ -70,14 +70,20 @@ def pay_booking(request):
       "TransactionDesc":   "Sawacom session booking"
     }
 
-    stk_res  = requests.post(
-        stk_url,
-        json=payload,
-        headers={
-          "Authorization": f"Bearer {access_token}",
-          "Content-Type":  "application/json"
-        }
-    )
+    try:
+        stk_res  = requests.post(
+            stk_url,
+            json=payload,
+            headers={
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type":  "application/json"
+            },
+            timeout=30
+        )    
+    except requests.exceptions.Timeout:
+        return JsonResponse({"success": False,
+                            "error": "M-Pesa is not responding. Try again later."},
+                            status=504)
     stk_data = stk_res.json()
     if "errorCode" in stk_data:
         return JsonResponse({
@@ -119,11 +125,14 @@ def mpesa_callback(request):
         body = request.data.get("Body", {})
         cb   = body.get("stkCallback", {})
         cid  = cb.get("CheckoutRequestID")
-        code = cb.get("ResultCode")
+        code = int(cb.get("ResultCode", -1))
         desc = cb.get("ResultDesc")
+
+        print(cb,cid,code,desc)
 
         try:
             mp = MpesaPayment.objects.get(checkout_request_id=cid)
+            print(mp)
         except MpesaPayment.DoesNotExist:
             # Safaricom expects a JSON with ResultCode != 0 on error
             return Response({"ResultCode": 1, "ResultDesc": "Booking not found"},
@@ -151,12 +160,13 @@ def mpesa_callback(request):
         return redirect('booking:book')
 
     timeout_secs = 180 
-    interval_secs = 5
+    interval_secs = 2
     start = time.time()
 
     while True:
         try:
             mp = MpesaPayment.objects.get(checkout_request_id=cid)
+            print("Timing")
         except MpesaPayment.DoesNotExist:
             messages.error(request, "Invalid payment reference.")
             return redirect('booking:book')
@@ -170,9 +180,10 @@ def mpesa_callback(request):
 
         time.sleep(interval_secs)
 
+    print("breaked loop")
 
     # now we have a result
-    if mp.result_code == 0:
+    if str(mp.result_code) == "0":
         messages.success(request, mp.result_desc or "Payment successful! Booking confirmed.")
         return redirect('/')
     else:
