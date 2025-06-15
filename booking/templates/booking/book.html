@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Speak to a licensed therapist | Sawacom{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'booking/book.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-wrapper booking-container">
+  <h1>Speak to a licensed therapist</h1>
+
+  <form id="bookingForm" class="booking-form">
+    {% csrf_token %}
+    <div id="bookingMessage" class="alert" style="display:none;"></div>
+
+    <!-- date -->
+    <div class="input-group">
+      <label for="date">Date</label>
+      <input type="date" id="date" name="date" class="form-control" required>
+    </div>
+
+    <!-- time -->
+    <div class="input-group">
+      <label for="time">Time</label>
+      <input type="time" id="time" name="time" class="form-control" required>
+    </div>
+
+    <!-- note -->
+    <div class="input-group">
+      <label for="note">Notes (optional)</label>
+      <textarea id="note" name="note" rows="3"
+                class="form-control"
+                placeholder="Any extra details…"></textarea>
+    </div>
+
+    <!-- mpesa phone -->
+    <div class="input-group">
+      <label for="phone">M-Pesa Phone Number</label>
+      <input type="tel" id="phone" name="phone"
+             class="form-control"
+             placeholder="07XX XXX XXX" required>
+    </div>
+
+    <button type="submit" id="submitBtn" class="btn primary-btn">
+      Continue to Payment
+    </button>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (async () => {
+    const form      = document.getElementById('bookingForm');
+    const msgBox    = document.getElementById('bookingMessage');
+    const btn       = document.getElementById('submitBtn');
+    const token     = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const PAY_URL   = "{% url 'booking:pay_booking' %}";
+    const STAT_URL  = "{% url 'booking:status_api' %}";
+  
+    function notify(text, type='') {
+      msgBox.textContent     = text;
+      msgBox.className       = 'alert ' + type;
+      msgBox.style.display   = 'block';
+    }
+  
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      btn.disabled = true;
+      notify('⏳ Initiating payment…', '');  
+  
+      // 1) kick off STK push & get checkout_request_id
+      const payload = {
+        date:         form.date.value,
+        time:         form.time.value,
+        note:         form.note.value,
+        phone_number: form.phone.value
+      };
+      console.log(payload)
+      let res = await fetch(PAY_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken':  token
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!data.success) {
+        notify('❌ ' + data.error, 'error');
+        btn.disabled = false;
+        return;
+      }
+  
+      notify('📱 Check your phone for the M-Pesa prompt…', '');  
+      const cid = data.checkout_request_id;
+  
+      // 2) poll for completion
+      const interval = setInterval(async () => {
+        let st = await fetch(`${STAT_URL}?checkout_request_id=${cid}`, { headers:{ 'X-CSRFToken': token }});
+        let sd = await st.json();
+  
+        if (sd.status === 'pending') return;
+  
+        clearInterval(interval);
+        if (sd.status === 'success') {
+          notify('✅ Payment confirmed! Your session is booked.', 'success');
+        } else {
+          notify('❌ Payment failed: ' + sd.error, 'error');
+        }
+        btn.disabled = false;
+      }, 5000);
+    });
+  })();
+  </script>
+  {% endblock %}

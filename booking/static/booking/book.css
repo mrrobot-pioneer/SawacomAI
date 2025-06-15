@@ -1,0 +1,30 @@
+.booking-container{
+  max-width: 50rem;
+}
+
+/* Info Section */
+.info-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--secondary-color);
+  border-left: 0.5rem solid var(--primary-color);
+  border-radius: 0.8rem;
+}
+.info-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+.info-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+.info-item {
+  margin-bottom: 0.8rem;
+  font-size: 1.4rem;
+  color: var(--text-color);
+}
+.info-item strong {
+  color: var(--text-color);
+}

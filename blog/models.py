@@ -1,13 +1,13 @@
 from django.db import models
-from django.contrib.auth.models import User
 from django_ckeditor_5.fields import CKEditor5Field
+from django.conf import settings
 
 class Blog(models.Model):
     STATUS_CHOICES = [
         ('draft',     'Draft'),
         ('published', 'Published'),
     ]
-    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='blog_posts')   
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='blog_posts')   
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, editable=False) # SEO friendly urls, Automatically generated slug from title
     thumbnail = models.ImageField(upload_to='blog_thumbnails/')

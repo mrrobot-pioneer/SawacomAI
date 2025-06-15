@@ -10,6 +10,7 @@ urlpatterns = [
     path('users/', include('users.urls')), # Auth and user profiles
     path('accounts/', include('allauth.urls')), # social authentication => Google
     path('', include('pages.urls')), # Static pages like /about, /contact
+    path('book/', include('booking.urls')), # book a session
     path('blog/', include('blog.urls')), # Blog section for articles, posts, etc. 
     path("ckeditor5/", include('django_ckeditor_5.urls')), #ckeditor for rich text editing
 ]

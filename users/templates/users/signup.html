@@ -14,7 +14,7 @@ Signup securely to Sawacom | 24/7 AI Mental Health Companion
 
 {% block content %}
 
-<section class="auth-container" id="signup-section">
+<section class="form-wrapper auth-container" id="signup-section">
   <h1>Create Account</h1>
   <form method="post" action="{% url 'users:signup' %}">
     {% csrf_token %}

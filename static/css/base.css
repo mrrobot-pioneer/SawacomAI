@@ -254,10 +254,9 @@ a:hover{
 .global-messages {
     list-style: none;
     padding: 0;
-    position: fixed;
+    position: sticky;
     top: 6rem;
     width: 100%;
-    right: 0;
     z-index: 10;
   }
   
@@ -328,8 +327,49 @@ a:hover{
     gap: 1rem;
     margin-top: 1rem;
 }
-  
 
+/* form */
+.form-wrapper{
+    max-width: 40rem;
+    margin: 4rem auto;
+    padding: 2rem;
+    background: var(--bg-color);
+    border-radius: 1.5rem;
+    border: 1px solid var(--input-border);
+}
+
+.form-wrapper h1 {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.form-wrapper form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-wrapper .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.form-wrapper label{
+    font-size: 1.35rem;
+    margin-left: 1rem;
+    font-weight: 500;
+}
+
+.form-wrapper input, .form-wrapper textarea{
+    width: 100%;
+    padding: 1rem 1.2rem;
+    font-size: 1.35rem;
+    border: 1px solid var(--input-border);
+    border-radius: 3rem;
+    background: var(--input-bg);
+}
+  
 
 /* Header */
 .header{
@@ -803,5 +843,12 @@ a:hover{
 
     .sidebar .chat-menu{
         display: inline-block !important;
+    }
+}
+
+@media (max-width: 425px) {
+    .form-wrapper {
+        margin: 3rem 1.5rem;
+        padding: 1.5rem;
     }
 }

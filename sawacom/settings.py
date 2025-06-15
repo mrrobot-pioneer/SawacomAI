@@ -162,7 +162,7 @@ LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = [
     'email*',
     'password1*',
@@ -206,3 +206,10 @@ CKEDITOR_5_CONFIGS = {
         },
     }
 }
+
+# mpesa credentials
+MPESA_CONSUMER_KEY    = os.getenv('MPESA_CONSUMER_KEY')
+MPESA_CONSUMER_SECRET = os.getenv('MPESA_CONSUMER_SECRET')
+MPESA_BASE_URL        = os.getenv('MPESA_BASE_URL')
+MPESA_SHORTCODE       = os.getenv('MPESA_SHORTCODE')
+MPESA_PASSKEY         = os.getenv('MPESA_PASSKEY') 
