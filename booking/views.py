@@ -62,9 +62,11 @@ def pay_booking(request):
       "PartyB":            shortcode,
       "PhoneNumber":       data['phone_number'],
       "CallBackURL":       callback_url,
-      "AccountReference":  str(booking.id),
+      "AccountReference":  f"SAW{ts}"[:11],
       "TransactionDesc":   "Sawacom session booking"
     }
+
+    print(payload)
 
     stk_res  = requests.post(
         stk_url,
