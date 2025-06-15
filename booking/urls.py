@@ -8,8 +8,6 @@ urlpatterns = [
     path('', views.book_session, name='book'),
     # AJAX: init STK push
     path('payment/', views.pay_booking, name='pay_booking'),
-    # AJAX: poll payment status
-    path('api/status/', views.payment_status_api, name='status_api'),
     # MPesa callback (no CSRF)
-    path('api/mpesa/callback/', views.mpesa_callback_api, name='mpesa_callback_api'),
+    path('mpesa/callback/', views.mpesa_callback, name='mpesa_callback'),
 ]

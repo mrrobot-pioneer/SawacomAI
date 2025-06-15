@@ -58,7 +58,7 @@
     const btn       = document.getElementById('submitBtn');
     const token     = document.querySelector('[name=csrfmiddlewaretoken]').value;
     const PAY_URL   = "{% url 'booking:pay_booking' %}";
-    const STAT_URL  = "{% url 'booking:status_api' %}";
+    const CB_URL  = "{% url 'booking:mpesa_callback' %}";
   
     function notify(text, type='') {
       msgBox.textContent     = text;
@@ -78,7 +78,6 @@
         note:         form.note.value,
         phone_number: form.phone.value
       };
-      console.log(payload)
       let res = await fetch(PAY_URL, {
         method: 'POST',
         headers: {
@@ -97,21 +96,12 @@
       notify('📱 Check your phone for the M-Pesa prompt…', '');  
       const cid = data.checkout_request_id;
   
-      // 2) poll for completion
-      const interval = setInterval(async () => {
-        let st = await fetch(`${STAT_URL}?checkout_request_id=${cid}`, { headers:{ 'X-CSRFToken': token }});
-        let sd = await st.json();
-  
-        if (sd.status === 'pending') return;
-  
-        clearInterval(interval);
-        if (sd.status === 'success') {
-          notify('✅ Payment confirmed! Your session is booked.', 'success');
-        } else {
-          notify('❌ Payment failed: ' + sd.error, 'error');
-        }
-        btn.disabled = false;
-      }, 5000);
+    try {
+      const statRes = await fetch(`${CB_URL}?checkout_request_id=${data.checkout_request_id}`);
+    } catch(err) {
+      notify('❌ Network error. Please try again.', 'error');
+      btn.disabled = false;
+    }
     });
   })();
   </script>

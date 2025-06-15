@@ -1,12 +1,16 @@
-import json, base64, requests
+import json, base64, requests, time
 from django.conf import settings
 from django.urls import reverse
-from django.shortcuts import render
-from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.contrib     import messages
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response    import Response
+from rest_framework             import status
 
 from .models import Booking, MpesaPayment
 
@@ -50,7 +54,7 @@ def pay_booking(request):
     ts        = timezone.now().strftime("%Y%m%d%H%M%S")
     password  = base64.b64encode(f"{shortcode}{passkey}{ts}".encode()).decode()
     stk_url   = f"{settings.MPESA_BASE_URL}/mpesa/stkpush/v1/processrequest"
-    callback_url = request.build_absolute_uri(reverse('booking:mpesa_callback_api'))
+    callback_url = request.build_absolute_uri(reverse('booking:mpesa_callback'))
 
     payload = {
       "BusinessShortCode": shortcode,
@@ -65,8 +69,6 @@ def pay_booking(request):
       "AccountReference":  f"SAW{ts}"[:11],
       "TransactionDesc":   "Sawacom session booking"
     }
-
-    print(payload)
 
     stk_res  = requests.post(
         stk_url,
@@ -96,7 +98,7 @@ def pay_booking(request):
         checkout_request_id = stk_data["CheckoutRequestID"],
         merchant_request_id = stk_data["MerchantRequestID"],
         amount              = payload["Amount"],
-        phone_number        = data["phone_number"]
+        phone_number        = data["phone_number"],
     )
 
     return JsonResponse({
@@ -105,54 +107,74 @@ def pay_booking(request):
     })
 
 
-@login_required
-def payment_status_api(request):
+@api_view(['GET','POST'])
+@permission_classes([AllowAny])
+def mpesa_callback(request):
     """
-    Poll this with ?checkout_request_id=...  
-    Returns status = pending / success / failed
+    POST: Safaricom STK-Push webhook → update payment & booking
+    GET : Browser long-poll → wait for result_code, then redirect with Django messages
     """
-    cid = request.GET.get("checkout_request_id")
+    # --- 1) Safaricom webhook (no auth) ---
+    if request.method == 'POST':
+        body = request.data.get("Body", {})
+        cb   = body.get("stkCallback", {})
+        cid  = cb.get("CheckoutRequestID")
+        code = cb.get("ResultCode")
+        desc = cb.get("ResultDesc")
+
+        try:
+            mp = MpesaPayment.objects.get(checkout_request_id=cid)
+        except MpesaPayment.DoesNotExist:
+            # Safaricom expects a JSON with ResultCode != 0 on error
+            return Response({"ResultCode": 1, "ResultDesc": "Booking not found"},
+                            status=status.HTTP_200_OK)
+
+        # update payment record
+        mp.result_code = code
+        mp.result_desc = desc
+        mp.save()
+
+        # confirm booking if successful
+        if code == 0:
+            b = mp.booking
+            b.confirmed = True
+            b.save(update_fields=['confirmed'])
+
+        # acknowledge to Safaricom
+        return Response({"ResultCode": 0, "ResultDesc": "Accepted"},
+                        status=status.HTTP_200_OK)
+
+    # --- 2) Browser GET (long-poll + redirect) ---
+    cid = request.query_params.get('checkout_request_id')
     if not cid:
-        return JsonResponse({"success":False, "error":"Missing ID"}, status=400)
+        messages.error(request, "Missing payment reference.")
+        return redirect('booking:book')
 
-    try:
-        mp = MpesaPayment.objects.get(checkout_request_id=cid)
-    except MpesaPayment.DoesNotExist:
-        return JsonResponse({"success":False, "error":"Invalid ID"}, status=404)
+    timeout_secs = 180 
+    interval_secs = 5
+    start = time.time()
 
-    if mp.result_code is None:
-        return JsonResponse({"status":"pending"})
+    while True:
+        try:
+            mp = MpesaPayment.objects.get(checkout_request_id=cid)
+        except MpesaPayment.DoesNotExist:
+            messages.error(request, "Invalid payment reference.")
+            return redirect('booking:book')
+
+        if mp.result_code is not None:
+            break
+
+        if time.time() - start >= timeout_secs:
+            messages.error(request, "Payment is still processing. Please try again shortly.")
+            return redirect('booking:book')
+
+        time.sleep(interval_secs)
+
+
+    # now we have a result
     if mp.result_code == 0:
-        # mark booking confirmed
-        b = mp.booking
-        b.confirmed = True
-        b.save(update_fields=["confirmed"])
-        return JsonResponse({"status":"success"})
-    return JsonResponse({"status":"failed","error":mp.result_desc})
-
-
-@csrf_exempt
-@require_POST
-def mpesa_callback_api(request):
-    """
-    This endpoint is called by Safaricom after user enters PIN.
-    """
-    body     = json.loads(request.body)
-    stk_cb   = body.get("Body", {}).get("stkCallback", {})
-    cid      = stk_cb.get("CheckoutRequestID")
-    mreq     = stk_cb.get("MerchantRequestID")
-    code     = stk_cb.get("ResultCode")
-    desc     = stk_cb.get("ResultDesc")
-
-    try:
-        mp = MpesaPayment.objects.get(checkout_request_id=cid)
-    except MpesaPayment.DoesNotExist:
-        return JsonResponse({"ResultCode":1,"ResultDesc":"Booking not found"})
-
-    mp.merchant_request_id = mreq
-    mp.result_code         = code
-    mp.result_desc         = desc
-    mp.save()
-
-    # Safaricom expects a JSON ack with ResultCode 0
-    return JsonResponse({"ResultCode":0,"ResultDesc":"Accepted"})
+        messages.success(request, mp.result_desc or "Payment successful! Booking confirmed.")
+        return redirect('/')
+    else:
+        messages.error(request, mp.result_desc or "Payment failed. Please try again.")
+        return redirect('booking:book')
