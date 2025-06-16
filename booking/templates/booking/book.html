@@ -11,9 +11,13 @@
 <div class="form-wrapper booking-container">
   <h1>Speak to a licensed therapist</h1>
 
-  <form id="bookingForm" class="booking-form">
+  <form
+    id="bookingForm"
+    class="booking-form"
+    data-pay-url="{% url 'booking:pay_booking' %}"
+    data-status-url="{% url 'booking:mpesa_status' %}"
+  >
     {% csrf_token %}
-    <div id="bookingMessage" class="alert" style="display:none;"></div>
 
     <!-- date -->
     <div class="input-group">
@@ -51,56 +55,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    const form      = document.getElementById('bookingForm');
-    const msgBox    = document.getElementById('bookingMessage');
-    const btn       = document.getElementById('submitBtn');
-    const token     = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    const PAY_URL   = "{% url 'booking:pay_booking' %}";
-    const CB_URL  = "{% url 'booking:mpesa_callback' %}";
-  
-    function notify(text, type='') {
-      msgBox.textContent     = text;
-      msgBox.className       = 'alert ' + type;
-      msgBox.style.display   = 'block';
-    }
-  
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      btn.disabled = true;
-      notify('⏳ Initiating payment…', '');  
-  
-      // 1) kick off STK push & get checkout_request_id
-      const payload = {
-        date:         form.date.value,
-        time:         form.time.value,
-        note:         form.note.value,
-        phone_number: form.phone.value
-      };
-      let res = await fetch(PAY_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken':  token
-        },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (!data.success) {
-        notify('❌ ' + data.error, 'error');
-        btn.disabled = false;
-        return;
-      }
-  
-      notify('📱 Check your phone for the M-Pesa prompt…', '');  
-      const cid = data.checkout_request_id;
-  
-    try {
-      const statRes = await fetch(`${CB_URL}?checkout_request_id=${data.checkout_request_id}`);
-    } catch(err) {
-      notify('❌ Network error. Please try again.', 'error');
-      btn.disabled = false;
-    }
-    });
-  </script>
-  {% endblock %}
+  <script type="module" src="{% static 'booking/booking.js' %}"></script>
+{% endblock %}

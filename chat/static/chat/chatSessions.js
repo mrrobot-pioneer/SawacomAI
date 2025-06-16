@@ -21,6 +21,10 @@ import {
   renameSession
 } from './apiCalls.js';
 
+import {
+  createFlashMessage
+} from "../../../static/js/base.js"
+
 // ---------------------------------------------------------------------------
 // DOM CACHING & START‑UP
 // ---------------------------------------------------------------------------
@@ -210,8 +214,8 @@ function handleConfirmDelete() {
       if (id === getSessionId()) location.href = '/';
       else chatsList.querySelector(`li[data-session-id="${id}"]`)?.remove();
     })
-    .catch(err => showGlobalMessage(
-      !err.response ? 'Network error. Please try again.' : 'Could not delete session.'
+    .catch(err => createFlashMessage(
+      !err.response ? 'Network error. Please try again.' : 'Could not delete session.', 'error'
     ));
 }
 
@@ -253,26 +257,7 @@ function startRename(li, id, oldTitle) {
     renameSession(id, newTitle)
       .catch(() => {
         span.textContent = oldTitle;   // revert UI
-        showGlobalMessage('Could not rename chat session.');
+        createFlashMessage('Could not rename chat session.', 'error');
       });
   }
-}
-
-// ---------------------------------------------------------------------------
-// MISC  – global message banner helper
-// ---------------------------------------------------------------------------
-
-function showGlobalMessage(text) {
-  let ul = document.querySelector('ul.global-messages');
-  if (!ul) {
-    ul = document.createElement('ul');
-    ul.className = 'global-messages';
-    document.querySelector('main')?.prepend(ul);
-  }
-  const li = document.createElement('li');
-  li.className = 'global-message error';
-  li.setAttribute('role', 'alert');
-  li.innerHTML = `<span>${text}</span><span class="close-btn">&times;</span>`;
-  li.querySelector('.close-btn').addEventListener('click', () => li.remove());
-  ul.prepend(li);
 }

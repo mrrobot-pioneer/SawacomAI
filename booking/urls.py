@@ -4,10 +4,8 @@ from . import views
 app_name = 'booking'
 
 urlpatterns = [
-    # renders page
-    path('', views.book_session, name='book'),
-    # AJAX: init STK push
-    path('payment/', views.pay_booking, name='pay_booking'),
-    # MPesa callback (no CSRF)
-    path('mpesa/callback/', views.mpesa_callback, name='mpesa_callback'),
+    path("",                   views.book_session,   name="book"),
+    path("payment/",           views.pay_booking,    name="pay_booking"),
+    path("mpesa/callback/",     views.mpesa_callback,  name="mpesa_callback"),   
+    path("mpesa/status/",      views.mpesa_status,   name="mpesa_status"),    
 ]

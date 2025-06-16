@@ -1,8 +1,6 @@
 /**
  * baseUI.js
- * ────────────────────────────────────────────────────────────────────────────
- * Site-wide header + sidebar behaviour **and** a tiny Axios-CSRF helper.
- *
+ * ──────────────────────────────────────────────────────────────────────────── *
  *
  * 1. Header
  *    • Account-icon dropdown
@@ -12,6 +10,7 @@
  *    • Slide-in open / close (mobile + overlay)
  *    • `closeSidebar()` is exported *and* attached to `window` for legacy code
  * 3. getCookie()  ➜  Automatically wires CSRF header for Axios
+ * 4. createFlashMessage => globally create flash messages
  * ────────────────────────────────────────────────────────────────────────────
  */
 
@@ -107,4 +106,48 @@ export function getCookie(name) {
 if (typeof axios !== 'undefined') {
   const csrf = getCookie('csrftoken');
   if (csrf) axios.defaults.headers.common['X-CSRFToken'] = csrf;
+}
+
+
+/* ------------------------------------------------------------------ */
+/* 4 ▸ Global function to handle flash messages                                    */
+/* ------------------------------------------------------------------ */
+
+export function createFlashMessage(text, type = 'info', clearAll = false, autoDismiss = true ) {
+  // 1) Ensure container
+  let ul = document.querySelector('ul.global-messages');
+
+  // 2) Clear old if requested
+  if (clearAll) {
+    ul.innerHTML = '';
+  }
+
+  // 3) Build the <li>
+  const li = document.createElement('li');
+  li.className = `global-message ${type}`;
+  li.setAttribute('role', 'alert');
+  li.innerHTML = `
+    <span class="message-text">${text}</span>
+  `;
+
+  // 5) Add to DOM (prepend so newest on top)
+  ul.prepend(li);
+
+  // 6) Slide down
+  // Allow a tick for CSS to register initial state
+  requestAnimationFrame(() => li.classList.add('show'));
+
+  // 7) Auto-dismiss after 5s
+  if (autoDismiss) {
+    setTimeout(() => hideAndRemove(li), 5000);
+  }
+}
+
+/** Slides up a message, then removes it from the DOM */
+function hideAndRemove(li) {
+  li.classList.remove('show');
+  li.classList.add('hide');
+  li.addEventListener('transitionend', () => {
+    li.remove();
+  }, { once: true });
 }

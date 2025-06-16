@@ -37,6 +37,9 @@
     {% block styles %} {% endblock %}
 </head>
 <body>
+    <!-- Global messages -->
+    {% include 'partials/messages.html' %}
+
     <!-- Global sidebar -->
     {% include 'partials/sidebar.html' %}
 
@@ -44,9 +47,6 @@
     <main>
         <!-- Global header -->
         {% include 'partials/header.html' %}
-
-        <!-- Global messages -->
-        {% include 'partials/messages.html' %}
 
         {% include 'partials/delete-modal.html' %}
 

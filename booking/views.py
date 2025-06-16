@@ -81,9 +81,7 @@ def pay_booking(request):
             timeout=30
         )    
     except requests.exceptions.Timeout:
-        return JsonResponse({"success": False,
-                            "error": "M-Pesa is not responding. Try again later."},
-                            status=504)
+        return JsonResponse({"success": False, "error": "M-Pesa is not responding. Try again later."}, status=504)
     stk_data = stk_res.json()
     if "errorCode" in stk_data:
         return JsonResponse({
@@ -113,79 +111,66 @@ def pay_booking(request):
     })
 
 
-@api_view(['GET','POST'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def mpesa_callback(request):
     """
     POST: Safaricom STK-Push webhook → update payment & booking
     GET : Browser long-poll → wait for result_code, then redirect with Django messages
     """
+
     # --- 1) Safaricom webhook (no auth) ---
-    if request.method == 'POST':
-        body = request.data.get("Body", {})
-        cb   = body.get("stkCallback", {})
-        cid  = cb.get("CheckoutRequestID")
-        code = int(cb.get("ResultCode", -1))
-        desc = cb.get("ResultDesc")
+    # if request.method == 'POST':
+    body = request.data.get("Body", {})
+    cb   = body.get("stkCallback", {})
+    cid  = cb.get("CheckoutRequestID")
+    code = int(cb.get("ResultCode", -1))
+    desc = cb.get("ResultDesc")
 
-        print(cb,cid,code,desc)
+    print(cb,cid,code,desc)
 
-        try:
-            mp = MpesaPayment.objects.get(checkout_request_id=cid)
-            print(mp)
-        except MpesaPayment.DoesNotExist:
-            # Safaricom expects a JSON with ResultCode != 0 on error
-            return Response({"ResultCode": 1, "ResultDesc": "Booking not found"},
-                            status=status.HTTP_200_OK)
-
-        # update payment record
-        mp.result_code = code
-        mp.result_desc = desc
-        mp.save()
-
-        # confirm booking if successful
-        if code == 0:
-            b = mp.booking
-            b.confirmed = True
-            b.save(update_fields=['confirmed'])
-
-        # acknowledge to Safaricom
-        return Response({"ResultCode": 0, "ResultDesc": "Accepted"},
+    try:
+        mp = MpesaPayment.objects.get(checkout_request_id=cid)
+        print(mp)
+    except MpesaPayment.DoesNotExist:
+        # Safaricom expects a JSON with ResultCode != 0 on error
+        return Response({"ResultCode": 1, "ResultDesc": "Booking not found"},
                         status=status.HTTP_200_OK)
 
-    # --- 2) Browser GET (long-poll + redirect) ---
-    cid = request.query_params.get('checkout_request_id')
+    # update payment record
+    mp.result_code = code
+    mp.result_desc = desc
+    mp.save()
+
+    # confirm booking if successful
+    if code == 0:
+        b = mp.booking
+        b.confirmed = True
+        b.save(update_fields=['confirmed'])
+
+    # acknowledge to Safaricom
+    return Response({"ResultCode": 0, "ResultDesc": "Accepted"},
+                    status=status.HTTP_200_OK)
+
+
+def mpesa_status(request):
+    """
+    AJAX GET from the browser.
+      • code == null  → pending
+      • code == 0     → success
+      • code != 0     → failure
+    Front-end decides what to do with it.
+    """
+    cid = request.GET.get("checkout_request_id")
     if not cid:
-        messages.error(request, "Missing payment reference.")
-        return redirect('booking:book')
+        return JsonResponse({"code": -1, "desc": "Missing payment reference"}, status=400)
 
-    timeout_secs = 180 
-    interval_secs = 2
-    start = time.time()
+    try:
+        mp = MpesaPayment.objects.get(checkout_request_id=cid)
+    except MpesaPayment.DoesNotExist:
+        return JsonResponse({"code": -1, "desc": "Invalid payment reference"}, status=404)
 
-    while True:
-        try:
-            mp = MpesaPayment.objects.get(checkout_request_id=cid)
-            print("Timing")
-        except MpesaPayment.DoesNotExist:
-            messages.error(request, "Invalid payment reference.")
-            return redirect('booking:book')
-
-        if mp.result_code is not None:
-            break
-
-        if time.time() - start >= timeout_secs:
-            messages.error(request, "Payment is still processing. Please try again shortly.")
-            return redirect('booking:book')
-
-        time.sleep(interval_secs)
-
-    print("breaked loop")
-
-    # now we have a result
-    if str(mp.result_code) == "0":
-        messages.success(request, mp.result_desc or "Payment successful! Booking confirmed.")
-        return redirect('/')
-    else:
-        messages.error(request, mp.result_desc or "Payment failed. Please try again.")
-        return redirect('booking:book')
+    return JsonResponse({
+        "code": mp.result_code,
+        "desc": mp.result_desc   
+    })
