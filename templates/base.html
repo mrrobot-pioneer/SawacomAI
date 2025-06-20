@@ -40,6 +40,9 @@
     <!-- Global messages -->
     {% include 'partials/messages.html' %}
 
+    <!-- Global re-usable modal -->
+    {% include 'partials/global-modal.html' %}
+
     <!-- Global sidebar -->
     {% include 'partials/sidebar.html' %}
 
@@ -47,8 +50,6 @@
     <main>
         <!-- Global header -->
         {% include 'partials/header.html' %}
-
-        {% include 'partials/delete-modal.html' %}
 
         {% block content %} {% endblock %}
     </main>

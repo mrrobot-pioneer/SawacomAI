@@ -14,28 +14,15 @@
  * ---------------------------------------------------------------------------
  */
 
-import {
-  createMessageElement,
-  scrollChatToBottom,
-  activateChatLayout,
-  updateSendButtonState,
-} from './helpers.js';
+import { createMessageElement, scrollChatToBottom, activateChatLayout, updateSendButtonState } from './helpers.js';
 
-import { 
-  getSessionId, 
-  setSessionId, 
-  onSessionChange 
-} from './sessionManager.js';
+import { getSessionId, setSessionId, onSessionChange } from './sessionManager.js';
 
-import { 
-  fetchMessages, 
-  simulateBot 
-} from './apiCalls.js';
+import { fetchMessages, simulateBot } from './apiCalls.js';
 
-import {
-  loadSidebarSessions,
-  highlightActiveSession,
-} from './chatSessions.js';
+import { loadSidebarSessions, highlightActiveSession } from './chatSessions.js';
+
+import { createLoadingSpinner } from '../../../static/js/base.js';
 
 /* ------------------------------------------------------------------ */
 /*  A. Rotating welcome sub‑text                                       */
@@ -114,9 +101,10 @@ async function loadSessionMessages(id) {
 
 function showSpinner() {
   chatBody.innerHTML = '';
+  const spinner = createLoadingSpinner('var(--primary-color)', '3rem');
   const container = document.createElement('div');
   container.className = 'spinner-container';
-  container.innerHTML = '<div class="spinner"></div>';
+  container.innerHTML = spinner.outerHTML;
   chatBody.appendChild(container);
 }
 

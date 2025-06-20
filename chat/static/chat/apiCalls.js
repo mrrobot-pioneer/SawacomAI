@@ -25,7 +25,7 @@ export const fetchSessions = () =>
   
   // • DELETE /chat-sessions/:id/delete/ ---------------------------------------
   export const deleteSession = sessionId =>
-    axios.delete(`/chat-sessions/${sessionId}/delete/`);
+    axios.delete(`/chat-sessisons/${sessionId}/delete/`);
   
   // • PATCH /chat-sessions/:id/rename/ ----------------------------------------
   export const renameSession = (sessionId, title) =>

@@ -1,103 +1,146 @@
-import { createFlashMessage } from "../../../static/js/base.js";
+import { createFlashMessage, createLoadingSpinner, openModal } from "../../../static/js/base.js";
 
-const form     = document.getElementById("bookingForm");
-const btn      = document.getElementById("submitBtn");
-const { payUrl, statusUrl } = form.dataset;
+/* ------------------------------------------------------------------ */
+/* Enhance native pickers: open on any click/focus                    */
+/* ------------------------------------------------------------------ */
+['date', 'time'].forEach(id => {
+  const input = document.getElementById(id);
+  if (input && typeof input.showPicker === 'function') {
+    const open = () => input.showPicker();
+    input.addEventListener('focus', open);
+    input.addEventListener('click', open);
+  }
+});
 
-// how long we'll give M-Pesa to respond (ms)
-const MAX_WAIT   = 3 * 60_000;   // 3 minutes
-const POLL_EVERY = 5_000;        // poll every 5s
+/* ------------------------------------------------------------------ */
+/* Lock M-Pesa input to Kenyan format (254...)                        */
+/* ------------------------------------------------------------------ */
+const phoneInput = document.getElementById('phone');
+
+if (phoneInput) {
+  if (!phoneInput.value) phoneInput.value = '2547'; // Default prefix
+
+  phoneInput.addEventListener('keydown', (e) => {
+    const { key, selectionStart: s, selectionEnd: ePos } = e;
+    const isDigit  = /^[0-9]$/.test(key);
+    const isBacksp = key === 'Backspace';
+    const isDelete = key === 'Delete';
+
+    // Allow digits after prefix only
+    if (isDigit && s >= 3) return;
+
+    // Prevent deletion inside prefix
+    if ((isBacksp && s <= 3 && s === ePos) || (isDelete && s < 3)) {
+      e.preventDefault();
+      return;
+    }
+
+    // Block any non-digit input
+    if (key.length === 1 && !isDigit) e.preventDefault();
+  });
+
+  phoneInput.addEventListener('input', () => {
+    const digits = phoneInput.value.replace(/\D/g, '');
+    phoneInput.value = digits.startsWith('254') ? digits : '254' + digits.replace(/^254*/, '');
+    if (phoneInput.value.length < 3) phoneInput.value = '254';
+  });
+
+  phoneInput.addEventListener('focus', () => {
+    if (phoneInput.selectionStart < 4) phoneInput.setSelectionRange(4, 4);
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/* Booking Form Handler                                               */
+/* ------------------------------------------------------------------ */
+const form = document.getElementById("bookingForm");
+const btn  = document.getElementById("submitBtn");
 
 form.addEventListener("submit", async e => {
   e.preventDefault();
-  btn.disabled = true;
-
-  // 1) Kick off initial payment
-  createFlashMessage("Initiating payment…", "info", true, false);
 
   const payload = {
     date:         form.date.value,
     time:         form.time.value,
     note:         form.note.value,
     phone_number: form.phone.value,
+    amount:       1,
   };
+
+  // Ask user to confirm payment details before initiating STK push
+  const proceed = await openModal({
+    title: 'Confirm Payment',
+    html: `
+      <div class="confirmation-grid">
+          <div class="key">Professional:</div>
+          <div class="value">Therapist</div>
+          <div class="key">Duration:</div>
+          <div class="value">1 hour</div>
+          <div class="key">Date:</div>
+          <div class="value">${payload.date}</div>
+      </div>
+      <div class="border"></div>
+      <div class="confirmation-grid">
+        <div class="key">Mpesa Number:</div>
+        <div class="value">${payload.phone_number}</div>
+        <div class="key">Amount:</div>
+        <div class="value">KES ${payload.amount}</div>
+        <div class="key">Payment Method:</div>
+        <div class="value">M-Pesa (STK Push)</div>
+      </div>
+    `,
+    actions: [
+      { text: 'Cancel', value: false, className: 'btn btn-neutral' },
+      { text: 'Pay',    value: true,  className: 'btn primary-btn' }
+    ]
+  });
+
+  if (!proceed) return;
+
+  // Button loading state
+  btn.disabled = true;
+  btn.innerText = "Initiating Payment...";
+  btn.prepend(createLoadingSpinner());
+
+  const payUrl = "/book/payment/";
 
   try {
     const { data } = await axios.post(payUrl, payload);
 
-    if (!data.success) {
-      // clear old flashes, show this error, auto-dismiss
-      createFlashMessage(data.error, "error", true, true);
-      btn.disabled = false;
-      return;
-    }
+    btn.disabled = false;
+    btn.innerText = "Continue to Payment";
 
-    createFlashMessage(
-      "Check your phone for the M-Pesa prompt…",
-      "info",
-      true,
-      false       // sticky until replaced
-    );
+    createFlashMessage("Check your phone for the M-Pesa prompt…", "info", true, false);
 
-    // 2) Poll loop
-    const start = Date.now();
-    const intervalId = setInterval(async () => {
-      // bail if we've waited too long
-      if (Date.now() - start >= MAX_WAIT) {
-        clearInterval(intervalId);
-        createFlashMessage(
-          "⌛ Payment is still processing. Please try again later.",
-          "error",
-          true,
-          true
-        );
-        btn.disabled = false;
-        return;
+    /* -------------------------------------------------------------- */
+    /* Server-Sent Events: Wait for callback update without polling   */
+    /* -------------------------------------------------------------- */
+    const streamUrl = `/book/payment/stream/${data.checkout_request_id}/`;
+    const source = new EventSource(streamUrl);
+
+    source.onmessage = (e) => {
+      const status = JSON.parse(e.data);
+
+      if (status.code === null) return;  // still waiting
+
+      source.close();
+
+      if (status.code === 0) {
+        window.location.href = "/?paid=true";  // redirect with success
+      } else {
+        createFlashMessage(status.desc || "Payment failed.", "error", true, true);
       }
+    };
 
-      try {
-        const { data: status } = await axios.get(statusUrl, {
-          params: { checkout_request_id: data.checkout_request_id }
-        });
-
-        // still pending → keep polling
-        if (status.code === null) return;
-
-        clearInterval(intervalId);
-
-        if (status.code === 0) {
-          createFlashMessage(
-            status.desc || "Payment confirmed!",
-            "success",
-            true,
-            true
-          );
-        } else {
-          createFlashMessage(
-            status.desc || "Payment failed.",
-            "error",
-            true,
-            true
-          );
-        }
-      } catch (err) {
-        clearInterval(intervalId);
-        createFlashMessage(
-          "Could not fetch payment status. Please check your connection.",
-          "error",
-          true,
-          true
-        );
-      } finally {
-        btn.disabled = false;
-      }
-    }, POLL_EVERY);
+    source.onerror = () => {
+      source.close();
+      createFlashMessage("Connection lost. Please refresh the page.", "error", true, true);
+    };
 
   } catch (err) {
-    // network or server error on initial STK push
-    const msg = err.response?.data?.error
-      || "An unexpected error occurred.";
+    const msg = err.response?.data?.error || "An unexpected error occurred.";
     createFlashMessage(msg, "error", true, true);
-    btn.disabled = false;
+    btn.disabled  = false;
+    btn.innerText = "Continue to Payment";
   }
 });

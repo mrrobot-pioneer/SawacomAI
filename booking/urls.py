@@ -4,8 +4,8 @@ from . import views
 app_name = 'booking'
 
 urlpatterns = [
-    path("",                   views.book_session,   name="book"),
-    path("payment/",           views.pay_booking,    name="pay_booking"),
-    path("mpesa/callback/",     views.mpesa_callback,  name="mpesa_callback"),   
-    path("mpesa/status/",      views.mpesa_status,   name="mpesa_status"),    
+    path("", views.booking_page, name="book"),
+    path("payment/", views.initiate_payment, name="initiate_payment"),
+    path("payment/callback/", views.handle_mpesa_callback,  name="handle_mpesa_callback"),   
+    path("payment/stream/<str:checkout_id>/", views.payment_status_stream, name="mpesa_stream")
 ]

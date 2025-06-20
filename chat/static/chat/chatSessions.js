@@ -22,7 +22,8 @@ import {
 } from './apiCalls.js';
 
 import {
-  createFlashMessage
+  createFlashMessage,
+  openModal,
 } from "../../../static/js/base.js"
 
 // ---------------------------------------------------------------------------
@@ -136,8 +137,7 @@ function buildSessionLi(sess) {
 
   menuIcon .addEventListener('click', e => toggleChatOptions(e, menuIcon));
   renameOpt.addEventListener('click', e => { e.stopPropagation(); startRename(li, sess.id, title); });
-  deleteOpt.addEventListener('click', e => { e.stopPropagation(); showDeleteModal(sess.id); });
-
+  deleteOpt.addEventListener('click', e => { e.stopPropagation(); confirmDelete(sess.id); });
   return li;
 }
 
@@ -184,39 +184,27 @@ document.addEventListener('click', () => {
 // ---------------------------------------------------------------------------
 //  *UI only* – the server APIs are hit directly here; no need to touch store.
 
-let toDeleteSessionId = null;
-const deleteModal      = document.getElementById('deleteModal');
-const cancelDeleteBtn  = document.getElementById('cancelDeleteBtn');
-const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+function confirmDelete(sessionId) {
+  openModal({
+    title: 'Delete Chat?',
+    html:  '<p>Are you sure you want to delete this chat session?</p>',
+    actions: [
+      { text: 'Cancel', value: false, className: 'btn btn-neutral' },
+      { text: 'Delete', value: true,  className: 'btn btn-danger'  },
+    ],
+  }).then((shouldDelete) => {
+    if (!shouldDelete) return;
 
-if (deleteModal) {
-  deleteModal.addEventListener('click', hideDeleteModal);
-  cancelDeleteBtn?.addEventListener('click', hideDeleteModal);
-  confirmDeleteBtn?.addEventListener('click', handleConfirmDelete);
-}
+    deleteSession(sessionId)
+      .then(() => {
+        if (sessionId === getSessionId()) location.href = '/';
+        else chatsList.querySelector(`li[data-session-id="${sessionId}"]`)?.remove();
+      })
+      .catch(err => createFlashMessage(
+        !err.response ? 'Network error. Please try again.' : 'Could not delete session.', 'error'
+      ));
 
-function showDeleteModal(id) {
-  toDeleteSessionId      = id;
-  deleteModal.style.display = 'flex';
-}
-function hideDeleteModal() {
-  toDeleteSessionId      = null;
-  deleteModal.style.display = 'none';
-  if (typeof closeSidebar === 'function') closeSidebar();
-}
-function handleConfirmDelete() {
-  if (!toDeleteSessionId) return;
-  const id = toDeleteSessionId;
-  hideDeleteModal();
-
-  deleteSession(id)
-    .then(() => {
-      if (id === getSessionId()) location.href = '/';
-      else chatsList.querySelector(`li[data-session-id="${id}"]`)?.remove();
-    })
-    .catch(err => createFlashMessage(
-      !err.response ? 'Network error. Please try again.' : 'Could not delete session.', 'error'
-    ));
+  });
 }
 
 // -----------------------------  RENAME ------------------------------------
