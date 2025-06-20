@@ -34,7 +34,11 @@ def signup(request):
 def login(request):
     """
     Handle user login. Uses Django's AuthenticationForm to validate email+password.
+    Show a message if redirected from @login_required.
     """
+    if 'next' in request.GET:
+        messages.info(request, "Please log in to continue.")
+    
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
         if form.is_valid():
