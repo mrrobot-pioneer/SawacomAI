@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'users',
     'pages',
     'blog',
+    'announcements',
     'rest_framework',
     'django_ckeditor_5',
     'django.contrib.sites',               
@@ -88,6 +89,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                'announcements.context_processors.global_announcements',
             ],
         },
     },

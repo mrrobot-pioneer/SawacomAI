@@ -1,0 +1,5 @@
+{% if global_announcement and global_announcement.is_visible %}
+  <div class="global-announcement {{ global_announcement.category }}">
+    {{ global_announcement.message|linebreaksbr }}
+  </div>
+{% endif %}

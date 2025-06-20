@@ -47,7 +47,6 @@ body {
 main {
     flex: 1;
     margin: 0 auto;
-    padding: 0 1.5rem 0 1rem;
 }
 
 h1,h2,h3{
@@ -302,6 +301,27 @@ a:hover{
     opacity: 0;
 }
 
+/* announcements */
+.global-announcement{
+    padding: 0.75rem 1rem;
+    width: 100%;
+    font-size: 1.35rem;
+    display: flex;
+    justify-content: center;
+}
+.global-announcement.info{
+    background-color: var(--warning-bg);
+    color: var(--warning-text);
+}
+.global-announcement.success{
+    background-color: var(--success-bg);
+    color: var(--success-text);
+}
+.global-announcement.error{
+    background-color: var(--error-bg);
+    color: var(--error-text);
+}
+
 /* spinner */
 .global-spinner {
     display: inline-block;
@@ -419,6 +439,7 @@ a:hover{
     justify-content: space-between;
     align-items: center;
     height: 6rem;
+    padding: 0 1.5rem;
     background-color: var(--bg-color);
     position: sticky;
     top: 0;
