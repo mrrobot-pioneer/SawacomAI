@@ -48,12 +48,13 @@
 
     <!-- Main content injected here-->
     <main>
-        
-        <!-- Global announcement -->
-        {% include 'partials/announcements.html' %}
+        <div class="top-bar">
+            <!-- Global announcement -->
+            {% include 'partials/announcements.html' %}
 
-        <!-- Global header -->
-        {% include 'partials/header.html' %}
+            <!-- Global header -->
+            {% include 'partials/header.html' %}
+        </div>
 
         {% block content %} {% endblock %}
     </main>

@@ -430,9 +430,15 @@ a:hover{
     border-radius: 3rem;
     background: var(--input-bg);
 }
-  
+
 
 /* Header */
+.top-bar{
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
 .header{
     display: flex;
     width: 100%;
@@ -441,9 +447,6 @@ a:hover{
     height: 6rem;
     padding: 0 1.5rem;
     background-color: var(--bg-color);
-    position: sticky;
-    top: 0;
-    z-index: 100;
 }
 
 .header .sidebar-toggle{
