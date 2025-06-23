@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 
 from .models import ChatSession, ChatMessage
 from .serializers import ChatSessionSerializer, ChatMessageSerializer
-from .utils import simulate_response
+from .utils import ask_openai
 
 
 def index(request):
@@ -19,41 +19,42 @@ def index(request):
 
 
 @api_view(['POST'])
-def simulate_chatbot(request):
+def chat_with_bot(request):
     """
-    Accepts { "message": "...", "session_id": "<uuid>" (optional) }
-    Returns { "reply": "...", "session_id": "<uuid or null>" }
+    Accepts:  { "message": "...", "session_id": "<uuid>" (optional) }
+    Returns:  { "reply": "...", "session_id": "<uuid or null>" }
     """
     user_msg = request.data.get('message', '').strip()
-    session_uuid = request.data.get('session_id')  
-
+    session_uuid = request.data.get('session_id')
     session = None
-    new_title = None
 
+    if not user_msg:
+        return Response({'error': 'Message is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
+    # Handle chat session if user is logged in
     if request.user.is_authenticated:
         if session_uuid:
             try:
                 session = ChatSession.objects.get(id=session_uuid, user=request.user)
             except ChatSession.DoesNotExist:
-                return Response(
-                    {'error': 'Invalid session_id.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                return Response({'error': 'Invalid session_id.'}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            # Create a new ChatSession with a simple date-based title
-            now_local = localtime()
-            new_title = now_local.strftime("Chat on %b %d, %Y %I:%M %p")
-            session = ChatSession.objects.create(
-                user=request.user,
-                title=new_title
-            )
+            new_title = localtime().strftime("Chat on %b %d, %Y %I:%M %p")
+            session = ChatSession.objects.create(user=request.user, title=new_title)
 
-        # Save the user’s message
+        # Save user's message
         ChatMessage.objects.create(session=session, sender='user', content=user_msg)
 
-    bot_reply = simulate_response(user_msg)
+    # Ask OpenAI
+    try:
+        bot_reply = ask_openai(user_msg)
+    except Exception as e:
+        return Response(
+            {'error': f'Sorry, something went wrong: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
+    # Save bot reply if session exists
     if session:
         ChatMessage.objects.create(session=session, sender='bot', content=bot_reply)
 
@@ -78,7 +79,7 @@ def list_chat_sessions(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def list_chat_messages(request, session_id):
+def list_chat_session_messages(request, session_id):
     """
     GET /api/sessions/<uuid:session_id>/messages/
     Returns [ { id, sender, content, created_at }, … ] for that session.

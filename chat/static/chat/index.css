@@ -100,7 +100,7 @@
     fill: #fff;
     flex-shrink: 0;
     margin-bottom: .2rem;
-    align-self: flex-end;
+    align-self: flex-start;
     border-radius: 50%;
     background: var(--primary-color);
 }

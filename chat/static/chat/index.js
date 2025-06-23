@@ -175,13 +175,32 @@ function simulateBotResponse(userText) {
       generating = false;
       updateSendButtonState(generating);
     })
-    .catch(() => {
-      thinking.querySelector('.message-text').innerText = 'Sorry, something went wrong.';
+    .catch(err => {
+      let msg;
+    
+      if (!err.response) {
+        // 1) Network / CORS / timeout
+        msg = 'Network error. Check your connection and try again.';
+      } else if (err.response.data?.error) {
+        // 2) Server sent an explicit error string
+        msg = err.response.data.error;
+      } else {
+        // 3) Fallback in case neither condition above applies
+        msg = 'Sorry, something went wrong.';
+      }
+    
+      const textEl = thinking.querySelector('.message-text');
+      textEl.innerText = msg;
+      textEl.classList.add('error');
+    
       thinking.classList.remove('thinking');
-      thinking.querySelector('.message-text').classList.add('error');
+      scrollChatToBottom();
+      
+      // reset state
       generating = false;
       updateSendButtonState(generating);
     });
+    
 }
 
 /* ------------------------------------------------------------------ */

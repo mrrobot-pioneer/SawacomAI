@@ -210,6 +210,10 @@ CKEDITOR_5_CONFIGS = {
     }
 }
 
+# openai credentials
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4.1-mini')
+
 # mpesa credentials
 MPESA_CONSUMER_KEY    = os.getenv('MPESA_CONSUMER_KEY')
 MPESA_CONSUMER_SECRET = os.getenv('MPESA_CONSUMER_SECRET')

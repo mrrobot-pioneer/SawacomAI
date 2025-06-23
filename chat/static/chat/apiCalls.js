@@ -21,11 +21,11 @@ export const fetchSessions = () =>
   
   // • POST /simulate/ ---------------------------------------------------------
   export const simulateBot = payload =>
-    axios.post('/simulate/', payload).then(r => r.data);
+    axios.post('/chat/', payload).then(r => r.data);
   
   // • DELETE /chat-sessions/:id/delete/ ---------------------------------------
   export const deleteSession = sessionId =>
-    axios.delete(`/chat-sessisons/${sessionId}/delete/`);
+    axios.delete(`/chat-sessions/${sessionId}/delete/`);
   
   // • PATCH /chat-sessions/:id/rename/ ----------------------------------------
   export const renameSession = (sessionId, title) =>
