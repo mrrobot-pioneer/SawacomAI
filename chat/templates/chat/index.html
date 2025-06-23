@@ -16,34 +16,35 @@
 
     <!-- initial display when no chats yet -->
     <div class="chat-start" id="chatStart">
-        <div class="logo">
-            <img src="{% static 'images/logo.png' %}" alt="Sawacom Logo" class="logo-image"/>
+        <div class="hero-row">
+          <!-- Avatar cluster -->
+          <div class="avatar-stack">
+            <img src="{% static 'images/avatars/avatar1.png' %}" alt="User avatar" class="avatar">
+            <img src="{% static 'images/avatars/avatar2.png' %}" alt="User avatar" class="avatar">
+            <img src="{% static 'images/avatars/avatar3.png' %}" alt="User avatar" class="avatar">
+            <img src="{% static 'images/avatars/avatar4.png' %}" alt="User avatar" class="avatar">
+        </div>        
+        
+          <!-- Impact metric -->
+          <h2 class="impact-metric">
+            <strong>10.5K+</strong>&nbsp;lives listened to
+          </h2>
         </div>
         
-        <!-- Welcome Message -->
         <div class="welcome-message" id="welcomeMessage">
-            <h1 style="text-align: center;">Hi, I’m Sawacom — your mental health AI</h1>
-            
-            <div class="subtext-rotator">
-                <div class="subtext active" id="subtextContainer">
-                  <span>
-                    <i class="fas fa-user-secret"></i> Anonymous
-                  </span>
-                  <span class="separator"></span>
-                  <span>
-                    <i class="fas fa-dollar-sign"></i> Free
-                  </span>
-                  <span class="separator"></span>
-                  <span>
-                    <i class="fas fa-lock"></i> Secure
-                  </span>
-                </div>
-            </div>
+          <h1>
+              Hi, I’m Sawacom — your mental-health AI
+          </h1>
+        
+          <p class="welcome-description">
+            It’s free, private, and 100% anonymous.
+            Prefer a human touch? <a href="{% url 'booking:book' %}">Book a licensed therapist</a> for just KSh 5,000.
+          </p>
         </div>
 
         <!-- Chat Input -->
         <form class="chat-input-box" id="chatInputBox">
-            <textarea class="chat-input" id="userInput" placeholder="Ask Sawacom..." rows="1" autocomplete="off"></textarea>
+            <textarea class="chat-input" id="userInput" placeholder="Let’s talk. What’s been bothering you?" rows="1" autocomplete="off"></textarea>
             <button type="submit" id="sendButton" disabled>
                 <i class="fa-solid fa-arrow-up"></i>
                 <span class="tooltip empty-message">Message is empty</span>
@@ -53,6 +54,7 @@
 
     <!-- Footer -->
     <footer class="chat-footer" id="chatFooter">
+          
         <!-- chat-input-box will be inserted here when user sends a message-->
         <p class="disclaimer small-text">
             Sawacom is an AI assistant and not a licensed professional. 

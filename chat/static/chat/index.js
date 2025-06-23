@@ -2,7 +2,6 @@
  * index.js
  * ---------------------------------------------------------------------------
  * Main chat‑window UI for Sawacom.
- *  • Handles welcome sub‑text rotation
  *  • Manages user input & “thinking” bubbles
  *  • Talks to the backend *only* through sessionManager
  *  • Renders messages and keeps URL, sidebar & store in sync
@@ -25,39 +24,7 @@ import { loadSidebarSessions, highlightActiveSession } from './chatSessions.js';
 import { createLoadingSpinner } from '../../../static/js/base.js';
 
 /* ------------------------------------------------------------------ */
-/*  A. Rotating welcome sub‑text                                       */
-/* ------------------------------------------------------------------ */
-const subtextMessages = [
-  `
-    <span><i class="fas fa-user-secret"></i> Anonymous</span>
-    <span class="separator"></span>
-    <span><i class="fas fa-dollar-sign"></i> Free</span>
-    <span class="separator"></span>
-    <span><i class="fas fa-lock"></i> Secure</span>
-  `,
-  `
-    <span><i class="fas fa-user-md"></i>
-      <a href="#">Book a Professional</a> for <strong>Ksh 4500</strong>
-    </span>
-  `,
-];
-let subIdx = 0;
-const subtextContainer = document.getElementById('subtextContainer');
-
-function rotateSubtext() {
-  subtextContainer.classList.remove('active');
-  subtextContainer.classList.add('exit');
-  setTimeout(() => {
-    subIdx = (subIdx + 1) % subtextMessages.length;
-    subtextContainer.innerHTML = subtextMessages[subIdx];
-    subtextContainer.classList.remove('exit');
-    subtextContainer.classList.add('active');
-  }, 500);
-}
-setInterval(rotateSubtext, 4000);
-
-/* ------------------------------------------------------------------ */
-/*  B. DOM handles & initial UI state                                  */
+/*  A. DOM handles & initial UI state                                  */
 /* ------------------------------------------------------------------ */
 const textarea   = document.getElementById('userInput');
 const sendButton = document.getElementById('sendButton');
@@ -69,7 +36,7 @@ textarea.focus();
 updateSendButtonState(generating);
 
 /* ------------------------------------------------------------------ */
-/*  C. textarea auto‑resize                                            */
+/*  B. textarea auto‑resize                                            */
 /* ------------------------------------------------------------------ */
 textarea.addEventListener('input', () => {
   textarea.style.height = 'auto';
@@ -78,7 +45,7 @@ textarea.addEventListener('input', () => {
 });
 
 /* ------------------------------------------------------------------ */
-/*  D. Session change → load messages                                  */
+/*  C. Session change → load messages                                  */
 /* ------------------------------------------------------------------ */
 // subscribe once – any change triggers a refresh
 onSessionChange(id => loadSessionMessages(id));
@@ -125,7 +92,7 @@ function renderChatError(err) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  E. Render chat bubbles                                             */
+/*  D. Render chat bubbles                                             */
 /* ------------------------------------------------------------------ */
 function renderChatWindow(messages) {
   chatBody.innerHTML = '';
@@ -143,7 +110,7 @@ function renderChatWindow(messages) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  F. "Thinking" bubble + backend call                               */
+/*  E. "Thinking" bubble + backend call                               */
 /* ------------------------------------------------------------------ */
 function simulateBotResponse(userText) {
   const thinking = createMessageElement(`
@@ -204,7 +171,7 @@ function simulateBotResponse(userText) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  G. Send/Stop handler                                              */
+/*  F. Send/Stop handler                                              */
 /* ------------------------------------------------------------------ */
 function handleSendMessage(e) {
   e.preventDefault();
@@ -237,7 +204,7 @@ textarea.addEventListener('keydown', e => {
 });
 
 /* ------------------------------------------------------------------ */
-/*  H. Boot – restore session from URL                                */
+/*  G. Boot – restore session from URL                                */
 /* ------------------------------------------------------------------ */
 const urlId = new URLSearchParams(location.search).get('session_id');
 if (urlId) setSessionId(urlId);
