@@ -100,7 +100,7 @@
   
 .chat-body .chat-message .message-text {
     line-height: 1.85;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 400;
 }
 .chat-body .chat-message .message-text.error {

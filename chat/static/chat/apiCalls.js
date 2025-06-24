@@ -20,7 +20,7 @@ export const fetchSessions = () =>
     axios.get(`/chat-sessions/${sessionId}/messages/`).then(r => r.data);
   
   // • POST /simulate/ ---------------------------------------------------------
-  export const simulateBot = payload =>
+  export const sendMessageToBot = payload =>
     axios.post('/chat/', payload).then(r => r.data);
   
   // • DELETE /chat-sessions/:id/delete/ ---------------------------------------
