@@ -8,7 +8,7 @@
     margin-bottom: 1rem;
   }
   .blog-detail-container .post-meta {
-    font-size: 1.2rem;
+    font-size: 1.35rem;
     color: var(--text-faded);
     margin-bottom: 2rem;
     display: flex;
@@ -21,8 +21,8 @@
     margin-bottom: 2rem;
   }
   .post-content {
-    font-size: 1.35rem;
-    line-height: 1.6;
+    font-size: 1.5rem;
+    line-height: 1.85;
     color: var(--text-color);
   }
   
