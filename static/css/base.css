@@ -45,7 +45,7 @@
     --warning-bg: #3b2f17;
     --warning-text: #facc15;
     --shadow: 1px 4px 10px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.1);
-  }
+}
   
   
 html {
@@ -160,6 +160,7 @@ a:hover{
 }
 .primary-btn:hover {
     opacity: .85;
+    color: #fff;
 }
 
 .primary-btn-alt{
@@ -181,9 +182,9 @@ a:hover{
 
 
 .small-text{
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 300;
-    line-height: 1.55;
+    line-height: 1.6;
     color: var(--text-faded);
 }
 
@@ -557,10 +558,10 @@ a:hover{
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.5rem;
     padding: 1rem;
     font-size: 1.35rem;
-    border-radius:1rem;
+    border-radius: 1rem;
 
 }
 .account-dropdown li a:hover {
@@ -572,7 +573,6 @@ a:hover{
 }
 
 .account-dropdown li a.username{
-    display: inline-block;     
     max-width: 20rem;          
     white-space: nowrap;
     overflow: hidden;
@@ -580,6 +580,7 @@ a:hover{
     border-bottom: 1px solid var(--input-border);
     border-radius: 0;
     cursor: auto;
+    margin-bottom: .5rem;
 }
 .account-dropdown li a.username:hover{
     background-color: transparent;
@@ -619,7 +620,7 @@ a:hover{
     padding-right: .5rem;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
     height: 100vh; 
     position: sticky;
     top: 0;
@@ -647,7 +648,7 @@ a:hover{
     flex-direction: column;
     width: 100%;
     gap: 2.5rem;
-    padding: 2rem .5rem 0 2rem;
+    padding: 2rem .5rem 1rem 2rem;
 }
 
 .sidebar-top .upper{
@@ -720,7 +721,7 @@ a:hover{
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: .15rem;
+    gap: .2rem;
 }
 
 .sidebar-middle .chats-list .chat-session {
@@ -734,7 +735,7 @@ a:hover{
     transition: all 0.1s ease-in-out;
 }
 .sidebar-middle .chats-list .chat-session:hover{
-    background-color: var(--secondary-color);
+    background-color: var(--input-bg);
     cursor: pointer;
 }
 .sidebar-middle .chats-list .chat-session.active{
@@ -861,7 +862,7 @@ a:hover{
 
 /* sidebar page links */
 .sidebar-bottom{
-    padding: 0 1.5rem 2rem 2rem;
+    padding: 0 1rem 2rem 1rem;
 }
 
 .sidebar-links{
@@ -869,7 +870,7 @@ a:hover{
     margin-bottom: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: .2rem;
 }
 
 .sidebar-links li {
@@ -879,15 +880,27 @@ a:hover{
   }
 
 .sidebar-links a{
-    color: var(--text-color);
-    font-weight: 400;
     text-decoration: none;
+    color: var(--text-color);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
     font-size: 1.35rem;
-    transition: all 0.15s ease-in-out;
+    border-radius: 1rem;
 }
 .sidebar-links a:hover{
-    color: var(--text-faded);
-    text-decoration: underline;
+    background-color: var(--input-bg);
+}
+.sidebar-links li.active > a{
+    background-color: var(--secondary-color);
+    font-weight: 500;
+}
+
+.sidebar-links a i {
+    font-size: 1.5rem;
+    color: var(--text-color);
 }
 
 .sidebar .disclaimer a {

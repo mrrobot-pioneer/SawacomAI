@@ -45,16 +45,56 @@
     <div class="sidebar-bottom">
         <nav>
             <ul class="sidebar-links">
-                <li><a href="{% url 'booking:book' %}">Book a Professional</a></li>
-                <li><a href="{% url 'pages:about' %}">About Sawacom</a></li>
-                <li><a href="{% url 'pages:contact' %}">Contact Us</a></li>
-                <li><a href="{% url 'pages:terms' %}">Terms of Service</a></li>
-                <li><a href="{% url 'pages:privacy' %}">Privacy Policy</a></li>
-                <li><a href="{% url 'blog:list' %}">Our Blog</a></li>
+                {% url 'booking:book' as book_url %}
+                <li class="{% if request.path == book_url %}active{% endif %}">
+                    <a href="{{ book_url }}">
+                        <i class="fa-solid fa-user-md"></i>
+                        Book a Professional
+                    </a>
+                </li>
+              
+                {% url 'pages:about' as about_url %}
+                <li class="{% if request.path == about_url %}active{% endif %}">
+                    <a href="{{ about_url }}">
+                        <i class="fa-solid fa-circle-info"></i>
+                        About Sawacom
+                    </a>
+                </li>
+              
+                {% url 'pages:contact' as contact_url %}
+                <li class="{% if request.path == contact_url %}active{% endif %}">
+                    <a href="{{ contact_url }}">
+                        <i class="fa-solid fa-phone"></i>
+                        Contact Us
+                    </a>
+                </li>
+              
+                {% url 'pages:terms'   as terms_url   %}
+                <li class="{% if request.path == terms_url %}active{% endif %}">
+                    <a href="{{ terms_url }}">
+                        <i class="fa-solid fa-file-contract"></i>
+                        Terms of Service
+                    </a>
+                </li>
+              
+                {% url 'pages:privacy' as privacy_url %}
+                <li class="{% if request.path == privacy_url %}active{% endif %}">
+                    <a href="{{ privacy_url }}">
+                        <i class="fa-solid fa-user-shield"></i>
+                        Privacy Policy
+                    </a>
+                </li>
+              
+                {% url 'blog:list' as blog_url %}
+                <li class="{% if request.resolver_match.view_name == 'blog:list' or request.resolver_match.view_name == 'blog:detail' %}active{% endif %}">
+                    <a href="{% url 'blog:list' %}">
+                        <i class="fa-solid fa-newspaper"></i>
+                        Our Blog
+                    </a>
+                </li>
               </ul>
-            
-        </nav>
-
+          </nav>
+    
         <p class="disclaimer small-text">
             Sawacom is an AI assistant and not a licensed professional. 
             For emergencies, call 999 or <a href="#">Book a professional</a>. 
