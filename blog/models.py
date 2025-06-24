@@ -1,6 +1,8 @@
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
 from django.conf import settings
+from .utils import add_target_blank
+from django.utils.text import slugify
 
 class Blog(models.Model):
     STATUS_CHOICES = [
@@ -24,9 +26,14 @@ class Blog(models.Model):
         ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
+        # 1) Generate slug once
         if not self.slug:
-            from django.utils.text import slugify
             self.slug = slugify(self.title)
+
+        # 2) Pre-process the HTML body exactly once per save()
+        if self.content:
+            self.content = add_target_blank(self.content)
+
         super().save(*args, **kwargs)
 
     def __str__(self):
