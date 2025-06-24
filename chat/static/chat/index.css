@@ -31,10 +31,11 @@
     align-items:center;
 }
 .avatar-stack .avatar {
-    width: 4rem;
+    width: 4.5rem;
     aspect-ratio: 1/1;      
     border-radius: 50%;
     object-fit: cover;
+    object-position: center;
     border: 3px solid var(--bg-color);
     margin-left: -1rem;
     position: relative;
@@ -79,7 +80,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    padding-top: 3rem;
+    padding: 3rem 0;
     position: relative;
 }
   
@@ -254,19 +255,37 @@
 }
 
 
-/* footer: dislaimer + chat-input-box */
+/* ───────── Smooth-fade sticky footer ───────── */
 .chat-footer {
     position: sticky;
     bottom: 0;
-    background-color: var(--bg-color);
     width: 100%;
-    padding: 1.5rem 0;
-    text-align: center;
-    z-index: 100; 
+    padding-bottom: 1.5rem;
+    background: var(--bg-color);
+    z-index: 100;
     display: flex;
     flex-direction: column-reverse;
     gap: 1rem;
-    margin-top: auto;
+  }
+  
+/* gradient veil that fades chat‐body content away */
+.chat-footer::before {
+    content: '';
+    position: absolute;
+    top: -2.5rem;          
+    left: 0;
+    right: 0;
+    height: 2.5rem;
+    pointer-events: none;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        var(--bg-color) 100%
+    );
+}
+
+.chat-footer .disclaimer{
+    text-align: center;
 }
 
 .chat-footer .disclaimer a {
@@ -277,21 +296,13 @@
     color: var(--primary-color);
 }
 
+/* ───── Responsive tweaks ───── */
 @media (max-width: 1024px) {
     .index{
-        padding: 0 1rem;
+        padding: 0 1.5rem;
     }   
 }
 
-@media (max-width: 425px) {
-    .chat-body:not(:empty){
-        padding: 1.5rem;
-    }
-}
-
-
-
-/* ───── Responsive tweaks ───── */
 @media (max-width:640px){
     .hero-row{
         flex-direction:column;
@@ -300,5 +311,10 @@
     }
     .impact-metric{
         text-align:center;
+    }
+
+    .chat-footer::before {
+      top: -3rem;
+      height: 3rem;
     }
 }
