@@ -208,3 +208,64 @@ export function openModal({ title, html, actions = [] }) {
     }, { once: true });
   });
 }
+
+
+/* ------------------------------------------------------------------ */
+// 6 ▸ THEME TOGGLE HANDLER
+/* ------------------------------------------------------------------ */
+document.getElementById('themeToggleBtn')?.addEventListener('click', async (e) => {
+  e.preventDefault();
+
+  const currentPref = getThemePreference(); // 'system', 'light', 'dark'
+
+  const html = `
+    <form id="themeForm" class="theme-options">
+      <label><input type="radio" name="theme" value="system" ${currentPref === 'system' ? 'checked' : ''}/> System</label><br/>
+      <label><input type="radio" name="theme" value="light" ${currentPref === 'light' ? 'checked' : ''}/> Light</label><br/>
+      <label><input type="radio" name="theme" value="dark" ${currentPref === 'dark' ? 'checked' : ''}/> Dark</label>
+    </form>
+  `;
+
+  const result = await openModal({
+    title: 'Choose Theme',
+    html,
+    actions: [
+      { text: 'Cancel', value: null, className: 'btn btn-neutral' },
+      { text: 'Apply', value: 'apply', className: 'btn primary-btn' }
+    ]
+  });
+
+  if (result === 'apply') {
+    const selected = document.querySelector('input[name="theme"]:checked')?.value;
+    if (selected) applyTheme(selected);
+  }
+});
+
+function getThemePreference() {
+  return localStorage.getItem('theme-pref') || 'system';
+}
+
+function applyTheme(mode) {
+  localStorage.setItem('theme-pref', mode);
+
+  const root = document.documentElement;
+
+  if (mode === 'light') {
+    root.classList.remove('dark-theme');
+  } else if (mode === 'dark') {
+    root.classList.add('dark-theme');
+  } else {
+    // system: match media
+    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    root.classList.toggle('dark-theme', systemDark);
+  }
+}
+
+// Re-apply on page load
+applyTheme(getThemePreference());
+
+// Also update on system theme change if using 'system'
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if (getThemePreference() === 'system') applyTheme('system');
+});
+

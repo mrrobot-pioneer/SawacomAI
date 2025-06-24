@@ -16,12 +16,20 @@
                 <span>{{ user.email }}</span>
               </a>
             </li>
+
             <li>
               <a href="#">
                 <i class="fa-solid fa-calendar-check"></i>
                 <span>Appointments</span>
               </a>
             </li>
+            <li class="theme" id="themeToggleBtn">
+              <a href="#">
+                <i class="fa-solid fa-circle-half-stroke"></i>
+                <span>Theme</span>
+              </a>
+            </li>
+            
             <li>
               <a href="{% url 'users:logout' %}">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -38,7 +46,7 @@
           
         </div>
       {% else %}
-        <a href="{% url 'users:login' %}" class="btn primary-btn login-btn">
+        <a href="{% url 'users:login' %}" class="btn primary-btn-alt login-btn">
           Log in
         </a>
       {% endif %}

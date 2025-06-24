@@ -22,15 +22,9 @@
 .auth-container .submit-btn {
     display: block;
     width: 100%;
-    color: #fff;
-    background: var(--primary-color);
     margin-top: 1.5rem;
 }
-.auth-container .submit-btn:hover {
-    opacity: .8;
-    background: var(--primary-color);
-    color: #fff;
-}
+
 
 .auth-container p.subtitle {
     text-align: center;
