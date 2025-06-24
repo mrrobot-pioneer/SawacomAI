@@ -24,6 +24,7 @@ import {
 import {
   createFlashMessage,
   openModal,
+  closeSidebar
 } from "../../../static/js/base.js"
 
 // ---------------------------------------------------------------------------
@@ -128,7 +129,7 @@ function buildSessionLi(sess) {
   // ----- interactions ------------------------------------------------------
   li.addEventListener('click', () => {
     selectSession(sess.id);
-    if (typeof closeSidebar === 'function') closeSidebar();
+    closeSidebar();
   });
 
   const menuIcon   = li.querySelector('.chat-menu');
@@ -233,8 +234,8 @@ function startRename(li, id, oldTitle) {
 
   function cancelRename() {
     input.remove(); span.style.display = 'inline';
-    if (typeof closeSidebar === 'function') closeSidebar();
   }
+
   function commitRename() {
     const newTitle = input.value.trim();
     if (!newTitle || newTitle === oldTitle) return cancelRename();
@@ -243,9 +244,10 @@ function startRename(li, id, oldTitle) {
     cancelRename();   // optimistic UI update
 
     renameSession(id, newTitle)
-      .catch(() => {
+      .catch((err) => {
         span.textContent = oldTitle;   // revert UI
-        createFlashMessage('Could not rename chat session.', 'error');
-      });
+        createFlashMessage(
+        !err.response ? 'Network error. Please try again.' : 'Could not rename session.', 'error'
+      )});
   }
 }
