@@ -39,6 +39,7 @@
     border: 3px solid var(--bg-color);
     margin-left: -1rem;
     position: relative;
+    background-color: var(--input-bg);
 }
 
 .avatar-stack .avatar:nth-child(1) { z-index: 3; margin-left: 0; }
@@ -90,9 +91,9 @@
 }
   
 .chat-body .chat-message .bot-avatar {
-    width: 3.5rem;
-    height: 3.5rem;
-    padding: .6rem;
+    width: 3rem;
+    height: 3rem;
+    padding: .5rem;
     fill: #fff;
     flex-shrink: 0;
     align-self: flex-start;
@@ -108,6 +109,8 @@
 .chat-body .chat-message .message-text.error {
     color: var(--error-text);
     background: var(--error-bg);
+    border-radius: 1.3rem 1.3rem 1.3rem 0;
+    padding: 1.2rem 1.5rem;
 }
   
 .chat-body .bot-message.thinking .message-text {
@@ -125,7 +128,7 @@
     border-radius: 1.3rem 1.3rem 0 1.3rem;
     max-width: 70%;
     padding: 1.2rem 1.5rem;
-
+    overflow-x: hidden;
 }
 
 .chat-body .bot-message .thinking-indicator {
@@ -200,6 +203,8 @@
     padding: .5rem;
     border-radius: 3rem;
     border: 1px solid var(--input-border);
+    position: relative;
+    margin-bottom: 2rem;
 }
 
 .chat-input-box textarea {
@@ -246,6 +251,7 @@
 }
 .chat-input-box button:disabled i {
     color: var(--text-faded);
+    opacity: .85;
 }
 
 .chat-input-box button:hover .tooltip:not(:empty) {
@@ -256,6 +262,18 @@
 .chat-input-box button i {
     font-size: 1.8rem;
 }
+
+/* ----- character counter ----- */
+.char-counter {
+    position: absolute;
+    word-break: keep-all;
+    top: calc(100% + 1rem);
+    right: 3%;
+}
+  
+.char-counter.limit-reached {
+    color: var(--error-text);
+}  
 
 
 /* ───────── Smooth-fade sticky footer ───────── */
@@ -273,20 +291,20 @@
   }
   
 /* gradient veil that fades chat‐body content away */
-.chat-footer::before {
+.chat-footer:has(.chat-input-box)::before {
     content: '';
     position: absolute;
-    top: -2.5rem;          
+    top: -2.5rem;
     left: 0;
     right: 0;
     height: 2.5rem;
     pointer-events: none;
     background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        var(--bg-color) 100%
+      to bottom,
+      transparent 0%,
+      var(--bg-color) 100%
     );
-}
+}  
 
 .chat-footer .disclaimer{
     text-align: center;

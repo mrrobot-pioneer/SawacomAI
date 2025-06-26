@@ -29,20 +29,34 @@ import { createLoadingSpinner } from '../../../static/js/base.js';
 const textarea   = document.getElementById('userInput');
 const sendButton = document.getElementById('sendButton');
 const chatBody   = document.getElementById('chatBody');
+let generating   = false;          // TRUE while waiting for backend
 
-let generating = false;          // TRUE while waiting for backend
-
-textarea.focus();
 updateSendButtonState(generating);
 
+
 /* ------------------------------------------------------------------ */
-/*  B. textarea auto‑resize                                            */
+/*  B. textarea Functionality => resize, focus, chars limit                                         */
 /* ------------------------------------------------------------------ */
+const MAX_CHARS  = 500;                       // <— limit
+const counterEl  = document.getElementById('charCounter');
+
+textarea.focus();
+
+// ---------------- textarea auto-resize + char limit ----------------
 textarea.addEventListener('input', () => {
+  // auto-resize
   textarea.style.height = 'auto';
   textarea.style.height = `${textarea.scrollHeight}px`;
   if (!generating) updateSendButtonState(generating);
+
+  // char counting
+  const len = textarea.value.trim().length;
+  const limitReached = len === MAX_CHARS;
+
+  counterEl.textContent = `${len} / ${MAX_CHARS}`;
+  counterEl.classList.toggle('limit-reached', limitReached);
 });
+
 
 /* ------------------------------------------------------------------ */
 /*  C. Session change → load messages                                  */

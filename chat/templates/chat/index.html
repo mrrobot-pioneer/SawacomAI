@@ -38,18 +38,20 @@
         
           <p class="welcome-description">
             It’s free, private, and 100% anonymous.
-            Prefer a human touch? <a href="{% url 'booking:book' %}">Book a licensed therapist</a> for just KSh 5,000.
+            Prefer a human touch? <a href="{% url 'booking:book' %}">Book a licensed therapist</a> for just Ksh 5,000.
           </p>
         </div>
 
         <!-- Chat Input -->
         <form class="chat-input-box" id="chatInputBox">
-            <textarea class="chat-input" id="userInput" placeholder="How can I help you today?" rows="1" autocomplete="off"></textarea>
+            <textarea class="chat-input" id="userInput" placeholder="How can I help you today?" rows="1" autocomplete="off" maxlength="5000"></textarea>
             <button type="submit" id="sendButton" disabled>
                 <i class="fa-solid fa-arrow-up"></i>
                 <span class="tooltip empty-message">Message is empty</span>
             </button>
+            <span id="charCounter" class="small-text char-counter">0 / 500</span>
         </form>
+        
     </div>
 
     <!-- Footer -->

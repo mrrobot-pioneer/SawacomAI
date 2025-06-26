@@ -28,8 +28,16 @@ def chat_with_bot(request):
     session_uuid = request.data.get('session_id')
     session = None
 
+    MAX_CHARS = 500
+
+    # Validate user message
     if not user_msg:
-        return Response({'error': 'Message is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Message is required.'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    if len(user_msg) > MAX_CHARS:
+        return Response({'error': 'Character limit exceeded. Please try a shorter message.'},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Handle chat session if user is logged in
     if request.user.is_authenticated:
