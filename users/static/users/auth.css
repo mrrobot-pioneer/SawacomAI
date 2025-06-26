@@ -28,7 +28,7 @@
 
 .auth-container p.subtitle {
     text-align: center;
-    font-size: 1.35rem;
+    font-size: 1.4rem;
     color: var(--text-faded);
     margin-top: 1rem;
 }
@@ -65,7 +65,8 @@
     align-items: center;
     justify-content: center;
     padding: .8rem;
-    font-size: 1.35rem;
+    font-size: 1.4rem;
+    font-weight: 400;
     border: 1px solid var(--input-border);
     border-radius: 3rem;
     background: var(--bg-color);

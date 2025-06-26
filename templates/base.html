@@ -1,8 +1,3 @@
-<!-- This is the base template for all pages in the Sawacom application.
-     It includes a header, sidebar, and a main content area. 
-     The blocks allow for page-specific content to be injected into the template.
--->
-
 {% load static %}
 
 <!DOCTYPE html>
@@ -16,6 +11,16 @@
 
     <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
 
+    <!-- Check theme before applying css -->
+    <script>
+        (function () {
+          const pref = localStorage.getItem('theme-pref') || 'system';
+          const isDark = pref === 'dark' ||
+                         (pref === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (isDark) document.documentElement.classList.add('dark-theme');
+        })();
+    </script>
+        
     <!-- Importing Google font => poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
