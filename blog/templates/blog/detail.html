@@ -8,26 +8,43 @@
 {% endblock %}
 
 {% block content %}
-<section class="blog-detail-container">
-  <h1>{{ post.title }}</h1>
+<div class="blog-layout-wrapper">
 
-  <p class="post-meta">
-    Created on: <time datetime="{{ post.created_at|date:'Y-m-d' }}">{{ post.created_at|date:"F j, Y" }}</time>
-    {% if post.author %}
-    <span class="separator" style="height: .3rem;"></span>
-    by {{ post.author.get_full_name|default:post.author }}
+  <!-- Main blog content -->
+  <section class="blog-detail-container">
+    <h1>{{ post.title }}</h1>
+
+    <p class="post-meta">
+      Created on: <time datetime="{{ post.created_at|date:'Y-m-d' }}">{{ post.created_at|date:"F j, Y" }}</time>
+      {% if post.author %}
+      <span class="separator" style="height: .3rem;"></span>
+      by {{ post.author.get_full_name|default:post.author }}
+      {% endif %}
+    </p>
+
+    {% if post.thumbnail %}
+    <div class="detail-thumb">
+      <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}">
+    </div>
     {% endif %}
-    </small>
-  </p>
 
-  {% if post.thumbnail %}
-  <div class="detail-thumb">
-    <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}">
-  </div>
-  {% endif %}
+    <div class="post-content">
+      {{ post.content|safe }}
+    </div>
+  </section>
 
-  <div class="post-content">
-    {{ post.content|safe }}
-  </div>
-</section>
+  <!-- Sidebar -->
+  <aside class="blog-sidebar">
+    <h3>More Articles</h3>
+    <ul>
+      {% for item in other_posts %}
+        <li>
+          <div class="separator"></div>
+          <a href="{% url 'blog:detail' item.slug %}">{{ item.title }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+</div>
 {% endblock %}

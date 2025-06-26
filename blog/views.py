@@ -22,6 +22,11 @@ def blog_detail(request, slug):
     Display a single blog post identified by its slug.
     """
     post = get_object_or_404(Blog, slug=slug, status='published')
+    
+    # Get up to 10 other published posts excluding the current one
+    other_posts = Blog.objects.filter(status='published').exclude(id=post.id).order_by('-created_at')[:10]
+
     return render(request, 'blog/detail.html', {
         'post': post,
+        'other_posts': other_posts,
     })
