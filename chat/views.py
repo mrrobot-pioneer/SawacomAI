@@ -5,10 +5,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-
+from django.views.decorators.http import require_GET
+from django.http import StreamingHttpResponse
 from .models import ChatSession, ChatMessage
 from .serializers import ChatSessionSerializer, ChatMessageSerializer
-from .utils import ask_openai
+from .utils import (validate_user_message, sse_error_response, make_error_stream, ask_openai_stream)
+from .memory_service import load_context
+from django.conf import settings
+import json
 
 
 def index(request):
@@ -18,26 +22,19 @@ def index(request):
     return render(request, 'chat/index.html')
 
 
-@api_view(['POST'])
-def chat_with_bot(request):
+@require_GET
+def chat_stream(request):
     """
-    Accepts:  { "message": "...", "session_id": "<uuid>" (optional) }
-    Returns:  { "reply": "...", "session_id": "<uuid or null>" }
+    SSE endpoint: validates, streams tokens, and passes errors as SSE events.
     """
-    user_msg = request.data.get('message', '').strip()
-    session_uuid = request.data.get('session_id')
+    user_msg = request.GET.get('message', '').strip()
+    session_uuid = request.GET.get('session_id')
     session = None
 
-    MAX_CHARS = 500
-
-    # Validate user message
-    if not user_msg:
-        return Response({'error': 'Message is required.'},
-                        status=status.HTTP_400_BAD_REQUEST)
-
-    if len(user_msg) > MAX_CHARS:
-        return Response({'error': 'Character limit exceeded. Please try a shorter message.'},
-                        status=status.HTTP_400_BAD_REQUEST)
+    # Validate user input
+    validation_err = validate_user_message(user_msg)
+    if validation_err:
+        return sse_error_response(validation_err)
 
     # Handle chat session if user is logged in
     if request.user.is_authenticated:
@@ -45,7 +42,7 @@ def chat_with_bot(request):
             try:
                 session = ChatSession.objects.get(id=session_uuid, user=request.user)
             except ChatSession.DoesNotExist:
-                return Response({'error': 'Invalid session_id.'}, status=status.HTTP_400_BAD_REQUEST)
+                return sse_error_response("Invalid session id.")
         else:
             new_title = localtime().strftime("Chat on %b %d, %Y %I:%M %p")
             session = ChatSession.objects.create(user=request.user, title=new_title)
@@ -53,23 +50,41 @@ def chat_with_bot(request):
         # Save user's message
         ChatMessage.objects.create(session=session, sender='user', content=user_msg)
 
-    # Ask OpenAI
-    try:
-        bot_reply = ask_openai(user_msg)
-    except Exception as e:
-        return Response(
-            {'error': f'Sorry, something went wrong: {str(e)}'},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+    # Load LangChain memory for this session (session.id if logged-in, else "anon-<ip-timestamp>")
+    mem_session_id = str(session.id) if session else request.META["REMOTE_ADDR"]
+    ctx = load_context(mem_session_id, settings)
 
-    # Save bot reply if session exists
-    if session:
-        ChatMessage.objects.create(session=session, sender='bot', content=bot_reply)
+    # Streaming generator
+    def event_stream():
+        yield 'retry: 2000\n'
+        yield f"event: meta\ndata: {json.dumps({'session_id': str(session.id) if session else None})}\n\n"
 
-    return Response({
-        'reply': bot_reply,
-        'session_id': str(session.id) if session else None
-    }, status=status.HTTP_200_OK)
+        full_reply = []
+        try:
+            for token in ask_openai_stream(user_msg, history=ctx.openai_messages):
+                full_reply.append(token)
+                yield f"data: {json.dumps({'token': token})}\n\n"
+        except Exception as e:
+            yield from make_error_stream(str(e), status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        yield "data: [DONE]\n\n"
+
+        # persist assistant reply for authenticated users
+        if session:
+            assistant_reply = "".join(full_reply)
+            ChatMessage.objects.create(session=session, sender='bot', content=assistant_reply)
+
+            # tell LangChain memory about the turn & persist
+            ctx.memory.save_context({"input": user_msg}, {"output": assistant_reply})
+
+            # Store summary on ChatSession
+            session.conversation_summary = ctx.memory.moving_summary_buffer
+            session.save(update_fields=["conversation_summary"])
+
+    response = StreamingHttpResponse(event_stream(), content_type='text/event-stream')
+    response['Cache-Control'] = 'no-cache'
+    response['X-Accel-Buffering'] = 'no'   # prevents Nginx from buffering
+    return response
 
 
 @api_view(['GET'])
@@ -97,7 +112,7 @@ def list_chat_session_messages(request, session_id):
         session = ChatSession.objects.get(id=session_id, user=user)
     except ChatSession.DoesNotExist:
         return Response(
-            {'detail': 'Chat session not found.'},
+            {'error': "Couldn't load this chat. It does not exist or was deleted."},
             status=status.HTTP_404_NOT_FOUND
         )
 

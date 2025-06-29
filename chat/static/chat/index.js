@@ -17,7 +17,7 @@ import { createMessageElement, scrollChatToBottom, activateChatLayout, updateSen
 
 import { getSessionId, setSessionId, onSessionChange } from './sessionManager.js';
 
-import { fetchMessages, sendMessageToBot } from './apiCalls.js';
+import { fetchMessages } from './apiCalls.js';
 
 import { loadSidebarSessions, highlightActiveSession } from './chatSessions.js';
 
@@ -65,7 +65,7 @@ textarea.addEventListener('input', () => {
 onSessionChange(id => loadSessionMessages(id));
 
 async function loadSessionMessages(id) {
-  if (!chatBody) return;                 // safety guard (should only run on chat page)
+  if (!chatBody || generating) return;      // safety guard (should only run on chat page and when not generating)
 
   activateChatLayout();
   syncUrl(id);
@@ -94,15 +94,30 @@ function renderChatError(err) {
   const banner = document.createElement('div');
   banner.id = 'chatErrorBanner';
   banner.className = 'chat-error-banner alert error';
-  const msg = !err.response ? 'Network error. Check your connection and try again.'
-                            : 'Error fetching messages. Please try again.';
+
+  let msg;
+  if (!err.response) {
+    msg = 'Network error. Check your connection and try again.';
+  } else if (err.response.data?.error) {
+    msg = err.response.data.error;
+  } else {
+    msg = 'Error fetching messages. Please try again.';
+  }
+
+  
   banner.innerHTML = `
     <p>${msg}</p>
-    <button class="retry-btn" onclick="location.reload()">
+    <button class="retry-btn" id="retryFetchBtn">
       <i class="fa-solid fa-rotate-right"></i> Retry
     </button>`;
   chatBody.appendChild(banner);
   scrollChatToBottom();
+
+  // Attach retry handler to refetch messages
+  document.getElementById('retryFetchBtn')?.addEventListener('click', () => {
+    const id = getSessionId();
+    if (id) loadSessionMessages(id);
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -123,65 +138,106 @@ function renderChatWindow(messages) {
   scrollChatToBottom();
 }
 
-/* ------------------------------------------------------------------ */
-/*  E. "Thinking" bubble + backend call                               */
-/* ------------------------------------------------------------------ */
+
+/* -------------------------------------------------------------- */
+/*  E. Streaming bot response with SSE + session-id handshake        */
+/* -------------------------------------------------------------- */
+
+let currentStream = null;           // holds the active EventSource
+
 function handleBotResponse(userText) {
+  /* ---------- 1. UI scaffolding ---------- */
   const thinking = createMessageElement(`
     <svg class="bot-avatar" xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 1024 1024">
       <path d="M738.3 287.6H285.7c-59 0-106.8 47.8-106.8 106.8v303.1c0 59 47.8 106.8 106.8 106.8h81.5v111.1c0 .7.8 1.1 1.4.7l166.9-110.6 41.8-.8h117.4l43.6-.4c59 0 106.8-47.8 106.8-106.8V394.5c0-59-47.8-106.9-106.8-106.9zM351.7 448.2c0-29.5 23.9-53.5 53.5-53.5s53.5 23.9 53.5 53.5-23.9 53.5-53.5 53.5-53.5-23.9-53.5-53.5zm157.9 267.1c-67.8 0-123.8-47.5-132.3-109h264.6c-8.6 61.5-64.5 109-132.3 109zm110-213.7c-29.5 0-53.5-23.9-53.5-53.5s23.9-53.5 53.5-53.5 53.5 23.9 53.5 53.5-23.9 53.5-53.5 53.5z"/>
     </svg>
     <div class="message-text"><div class="thinking-indicator"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`,
-    'bot-message thinking');
+    'bot-message thinking'
+  );
+
+  const textEl = thinking.querySelector('.message-text');
 
   activateChatLayout();
   chatBody.appendChild(thinking);
   scrollChatToBottom();
 
-  const payload = { message: userText };
-  if (getSessionId()) payload.session_id = getSessionId();
+  /* ---------- 2. build & open SSE stream ---------- */
+  const qs = new URLSearchParams({
+    message: userText,
+    session_id: getSessionId() || ''   // blank if new chat
+  }).toString();
 
-  sendMessageToBot(payload)
-    .then(data => {
-      // brand‑new chat? → update store + sidebar + URL
-      if (data.session_id && !getSessionId()) {
-        setSessionId(data.session_id);
-        loadSidebarSessions();
-        syncUrl(data.session_id);
-      }
+  const source = new EventSource(`/chat-stream/?${qs}`);
+  currentStream = source;             // so we can cancel later
 
-      thinking.querySelector('.message-text').innerHTML = data.reply.replace(/\n/g, '<br/>');
-      thinking.classList.remove('thinking');
-      scrollChatToBottom();
-      generating = false;
-      updateSendButtonState(generating);
-    })
-    .catch(err => {
-      let msg;
-    
-      if (!err.response) {
-        // 1) Network / CORS / timeout
-        msg = 'Network error. Check your connection and try again.';
-      } else if (err.response.data?.error) {
-        // 2) Server sent an explicit error string
-        msg = err.response.data.error;
-      } else {
-        // 3) Fallback in case neither condition above applies
-        msg = 'Sorry, something went wrong.';
+  /* ---- 2a. meta event: grab session_id once ---- */
+  source.addEventListener('meta', (e) => {
+    const { session_id } = JSON.parse(e.data || '{}');
+    if (session_id && !getSessionId()) {
+      setSessionId(session_id);
+      loadSidebarSessions();          // sidebar now shows fresh chat
+      syncUrl(session_id);
+    }
+  }, { once: true });                 // runs only once
+
+  /* ---- 2b. token stream ---- */
+  let firstChunk = true;   // track first incoming token
+
+  source.onmessage = (evt) => {
+    if (evt.data === '[DONE]') {
+      finishStream();
+      return;
+    }
+  
+    try {
+      const { token } = JSON.parse(evt.data);
+      if (token) {
+        // a. First real chunk: clear loader once
+        if (firstChunk) {
+          textEl.innerHTML = '';
+          thinking.classList.remove('thinking'); 
+          firstChunk = false;
+        }
+  
+        // b. Append chunk & keep chat pinned to bottom
+        textEl.innerHTML += token.replace(/\n/g, '<br/>');
+        scrollChatToBottom();
       }
-    
-      const textEl = thinking.querySelector('.message-text');
-      textEl.innerText = msg;
-      textEl.classList.add('error');
-    
-      thinking.classList.remove('thinking');
-      scrollChatToBottom();
-      
-      // reset state
-      generating = false;
-      updateSendButtonState(generating);
-    });
-    
+    } catch {
+      showError('Sorry, something went wrong.');
+    }
+  };
+  
+
+  /* ---- 2c. network / server ‘event: error’ error ---- */
+  source.addEventListener('error', (e) => {
+    if (e.data) {
+      // -> Server sent explicit error JSON
+      try {
+        const { error } = JSON.parse(e.data);
+        showError(error || 'Sorry, something went wrong.');
+      } catch {
+        showError('Sorry, something went wrong.');
+      }
+    } else {
+      // -> Network / CORS / timeout
+      showError('Network error. Check your connection and try again.');
+    }
+  });
+
+  /* ---------- 3. helpers ---------- */
+  function showError(msg) {
+    textEl.textContent = msg;
+    textEl.classList.add('error');
+    finishStream();
+  }
+
+  function finishStream() {
+    if (currentStream) currentStream.close();
+    currentStream = null;
+    generating = false;
+    updateSendButtonState(generating);
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -190,8 +246,10 @@ function handleBotResponse(userText) {
 function handleSendMessage(e) {
   e.preventDefault();
 
-  if (generating) {
-    // user hits “Stop” while generating
+  // user hits “Stop” while generating
+  if (generating && currentStream) {
+    currentStream.close();       // abort SSE
+    currentStream = null;
     generating = false;
     updateSendButtonState(generating);
     return;
