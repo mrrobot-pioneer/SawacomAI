@@ -160,6 +160,7 @@ MEDIA_ROOT = BASE_DIR / 'media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
 # Allauth settings
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/'
@@ -210,9 +211,15 @@ CKEDITOR_5_CONFIGS = {
     }
 }
 
+
 # openai credentials
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4.1-mini')
+OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4.1-mini') # for main replies
+OPENAI_SUMMARY_MODEL = os.getenv('OPENAI_SUMMARY_MODEL', 'gpt-4.1-nano') # cheaper summariser
+
+# Postgres in production, SQLite in dev
+PG_CONN = os.getenv("DATABASE_URL", "sqlite:///./db.sqlite3")
+
 
 # mpesa credentials
 MPESA_CONSUMER_KEY    = os.getenv('MPESA_CONSUMER_KEY')

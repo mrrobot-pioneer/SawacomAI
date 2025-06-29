@@ -21,6 +21,7 @@ class ChatSession(models.Model):
         max_length=200,
         blank=True,
     )
+    conversation_summary = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

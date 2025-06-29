@@ -5,7 +5,7 @@ from .models import ChatSession, ChatMessage
 
 @admin.register(ChatSession)
 class ChatSessionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'title', 'created_at')
+    list_display = ('id', 'user', 'title', 'conversation_summary', 'created_at')
     list_filter = ('user', 'created_at')
     search_fields = ('title', 'user__username', 'id')
     ordering = ('-created_at',)
