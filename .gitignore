@@ -43,3 +43,6 @@ Thumbs.db
 htmlcov/
 .coverage
 .tox/
+
+# Database files
+db.sqlite3
