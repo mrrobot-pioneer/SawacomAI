@@ -38,12 +38,12 @@
     --bg-sidebar: #161e2f;            
     --input-bg: #1e293b;
     --input-border: #334155;          
-    --success-bg: #1e3a3a;
-    --success-text: #5eead4;
-    --error-bg: #461d1d;
-    --error-text: #f87171;
-    --warning-bg: #3b2f17;
-    --warning-text: #facc15;
+    --success-bg   : #053E33;
+    --success-text : #34D399;  
+    --warning-bg   : #4A2E05;  
+    --warning-text : #FBBF24;   
+    --error-bg     : #4B1E1E;   
+    --error-text   : #F87171;   
     --shadow: 1px 4px 10px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.1);
 }
   
@@ -565,7 +565,7 @@ a:hover{
     z-index: 100;
 }
   
-.account-dropdown li a{
+.account-dropdown li .menu-item{
     text-decoration: none;
     color: var(--text-color);
     width: 100%;
@@ -577,15 +577,15 @@ a:hover{
     border-radius: 1rem;
 
 }
-.account-dropdown li a:hover {
+.account-dropdown li .menu-item:hover {
     background-color: var(--input-bg);
 }
 
-.account-dropdown li a i {
+.account-dropdown li .menu-item i {
     font-size: 1.5rem;
 }
 
-.account-dropdown li a.username{
+.account-dropdown li .menu-item.username{
     max-width: 20rem;          
     white-space: nowrap;
     overflow: hidden;
@@ -595,14 +595,14 @@ a:hover{
     cursor: auto;
     margin-bottom: .5rem;
 }
-.account-dropdown li a.username:hover{
+.account-dropdown li .menu-item.username:hover{
     background-color: transparent;
 }
 
-.account-dropdown li a.delete-account, .account-dropdown li a.delete-account{
+.account-dropdown li .menu-item.delete-account, .account-dropdown li .menu-item.delete-account{
     color: var(--error-text);
 }
-.account-dropdown li a.delete-account:hover{
+.account-dropdown li .menu-item.delete-account:hover{
     color: var(--error-text);
     background-color: var(--error-bg);
 }
@@ -751,7 +751,7 @@ a:hover{
     transition: all 0.1s ease-in-out;
 }
 .sidebar-middle .chats-list .chat-session:hover{
-    background-color: var(--input-bg);
+    background: var(--input-bg);
     cursor: pointer;
 }
 .sidebar-middle .chats-list .chat-session.active{
@@ -787,7 +787,6 @@ a:hover{
 
 .sidebar-middle .chats-list .chat-session .chat-menu:hover{
     background-color: var(--bg-color);
-    color: var(--primary-color);
 }  
 
 .chat-options {
@@ -910,7 +909,7 @@ a:hover{
     background-color: var(--input-bg);
 }
 .sidebar-links li.active > a{
-    background-color: var(--secondary-color);
+    background-color: var(--input-bg);
     font-weight: 500;
 }
 
