@@ -46,7 +46,6 @@ onSessionChange(id => highlightActiveSession(id));
 
 export function loadSidebarSessions() {
   if (!chatsList) return;
-  // renderLoadingSkeleton();
 
   fetchSessions()
     .then(renderSidebarSessions)
